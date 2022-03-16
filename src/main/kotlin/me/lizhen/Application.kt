@@ -12,10 +12,14 @@ fun main() {
         configureSerialization()
         configureHTTP()
 
-//        val dgraphClient = IdeographDgraphClient()
+
         val mongoClient = IdeographMongoClient()
 
+        val dgraphClient = IdeographDgraphClient()
+
         mongoClient.test()
+
+        dgraphClient.test()
 
     }.start(wait = true)
 }

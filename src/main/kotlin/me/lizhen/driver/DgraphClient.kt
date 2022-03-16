@@ -6,7 +6,7 @@ import io.dgraph.DgraphProto
 import io.grpc.ManagedChannelBuilder
 
 class IdeographDgraphClient(
-    private val hostAddr: String = "192.168.249.10",
+    private val hostAddr: String = "162.105.88.139",
     private val port: Int = 19482
 ){
     private val channel = ManagedChannelBuilder.forAddress(hostAddr, port).usePlaintext().build()
@@ -23,5 +23,12 @@ class IdeographDgraphClient(
 //        val query = dgraphClient.newTransaction().query("query{node(func: uid(0x1)){}}")
 //        println("INITed")
 //        println(query.json)
+    }
+
+    fun test() {
+        val v = dgraphClient.checkVersion()
+        v.allFields.forEach {
+            println(it)
+        }
     }
 }
