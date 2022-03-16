@@ -2,9 +2,10 @@ package me.lizhen
 
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import me.lizhen.driver.IdeographDgraphClient
-import me.lizhen.driver.IdeographMongoClient
+import me.lizhen.service.DgraphService
 import me.lizhen.plugins.*
+import me.lizhen.service.MongoService
+import me.lizhen.solvers.IdeographContext
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "localhost") {
@@ -12,14 +13,15 @@ fun main() {
         configureSerialization()
         configureHTTP()
 
+        val mongoService = MongoService()
+        val dgraphService = DgraphService(mongoService)
+        val ideographContext = IdeographContext(mongoService, dgraphService)
 
-        val mongoClient = IdeographMongoClient()
+//        ideographContext.apply {
+//            initializeSchema()
+//        }
 
-        val dgraphClient = IdeographDgraphClient()
-
-        mongoClient.test()
-
-        dgraphClient.test()
+        mongoService.test()
 
     }.start(wait = true)
 }
