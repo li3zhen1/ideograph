@@ -43,9 +43,34 @@ data class HasRelationConceptEdge(
     val name: String,
 )
 
+@Serializable
+data class HasPropertyEdge(
+    val _id: String,
+    val _class: String,
+    val fromId: Long,
+    val toId: Long,
+    val edgeId: Long,
+    val relationId: Long,
+    val name: String,
+)
 
 @Serializable
 data class ConceptNode(
+    val _id: String,
+    val _class: String,
+    val name: String,
+    val nodeId: Long,
+    val nodeLabel: String,
+    val label: String?,
+    val type: String?,
+    val labels: String?,
+    val types: String?,
+    val tags: String?,
+    val judgeParent: Boolean,
+)
+
+@Serializable
+data class PropertyNode(
     val _id: String,
     val _class: String,
     val name: String,

@@ -1,5 +1,6 @@
 package me.lizhen.schema
 
+import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -25,25 +26,28 @@ enum class ComparisonOperator(val value: Int) {
 data class PatternConstraint(
     val patternId: String,
     val targetType: PatternType,
+    val targetPatternId: String,
 
     val property: String,
     val operator: ComparisonOperator,
-    val value: String,
-
-    )
+    val value: String
+)
 
 
 @Serializable
 data class PatternEdge(
     val patternId: String,
 
-    val fromType: String,
-    val toType: String,
+    val type: String,
+
+    val fromPatternId: String,
+    val toPatternId: String,
 )
 
 
 @Serializable
 data class Pattern(
     val nodes: List<PatternNode>,
-    val constraints: List<PatternConstraint>
+    val edges: List<PatternEdge>?,
+    val constraints: List<PatternConstraint>?
 )

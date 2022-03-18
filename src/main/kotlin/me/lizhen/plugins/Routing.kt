@@ -8,27 +8,11 @@ import io.ktor.server.response.*
 import io.ktor.server.request.*
 import me.lizhen.schema.Pattern
 import me.lizhen.schema.PatternNode
+import me.lizhen.solvers.IdeographContext
 import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.json
 
 
 fun Application.configureRouting() {
     install(AutoHeadResponse)
-
-    routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
-
-        post("/solvePattern") {
-            val pattern = call.receive<Pattern>()
-
-            call.respondText {
-                pattern.nodes[0].json
-            }
-        }
-
-
-    }
-
 }

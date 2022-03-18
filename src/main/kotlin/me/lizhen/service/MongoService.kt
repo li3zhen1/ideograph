@@ -20,7 +20,6 @@ class MongoService(
     val database = client.getDatabase(databaseName)
 
     fun test() {
-
         val collection = database.getCollection<DriverNode>()
     }
 

@@ -22,9 +22,6 @@ class DgraphService(
         client.newTransaction().query("query{node(func: uid(0x1)){}}")
     }
 
-    fun lookupSingleNode(node: PatternNode) {
-
-    }
 
     private fun setDgraphSchema() {
         val stringBuilder = StringBuilder()
