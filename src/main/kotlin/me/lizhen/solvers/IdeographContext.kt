@@ -22,6 +22,22 @@ data class PatternSolution(
     val edges: Map<String, WorkspaceEdge>,
 )
 
+fun PatternSolution.validate(pattern: Pattern): Boolean {
+    return nodes.all { (pid, wn) ->
+
+        val pn = pattern.nodes.find {
+            it.patternId == pid
+        }!!
+
+        val constraints = pattern.constraints?.filter {
+            it.targetPatternId == pn.patternId
+        }!!
+
+        return@all constraints.validate(wn)
+    }
+
+}
+
 /**
  * null:
  *      yet to be evaluated
@@ -144,7 +160,6 @@ class IdeographContext(
                 it.patternId, pattern.constraints?.filter { pc -> pc.targetPatternId == it.patternId }.orEmpty()
             )
         }
-
 
         val patternNodeCandidateCounts = nodeConstraintPair.mapValues {
             patternNodeDict[it.key]?.let { n ->
