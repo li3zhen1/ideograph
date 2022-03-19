@@ -20,13 +20,15 @@ fun main() {
     embeddedServer(Netty, port = 8080, host = "localhost") {
 
 
+
+
+
         val mongoService = MongoService()
         val dgraphService = DgraphService(mongoService)
         val context = IdeographContext(mongoService, dgraphService)
 
         configureRouting()
         configureSerialization()
-        configureHTTP()
 
         mongoService.test()
 
@@ -38,11 +40,11 @@ fun main() {
 
                 post("/solvePattern") {
                     val pattern = call.receive<Pattern>()
-                    call.respond( context.solvePattern(pattern) )
+                    call.respond( solvePattern(pattern) )
                 }
             }
         }
 
-
+        configureHTTP()
     }.start(wait = true)
 }

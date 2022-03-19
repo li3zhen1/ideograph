@@ -18,6 +18,7 @@ import me.lizhen.service.MongoService
 import me.lizhen.solvers.IdeographContext
 import me.lizhen.solvers.PatternSolution
 import me.lizhen.solvers.validate
+import org.litote.kmongo.json
 import kotlin.time.*
 
 class ApplicationTest {
@@ -111,16 +112,20 @@ class ApplicationTest {
         // WorkspaceNode::properties.keyProjection("联系电话") regex "15[0-9]+",
 
         var solutions: List<PatternSolution>
-        val startTime = measureTime {
+        val time = measureTime {
             solutions = ctx.solvePattern(pattern)
         }
-        println(solutions)
+        println("\n\n\n\n$time, ${solutions.size}")
         return solutions
     }
 
+    @Test
+    fun getPatternJson() {
+        println(p3.json)
+    }
 
     @Test
-    fun testRoot() = testApplication {
+    fun testRoot() {
         val sol = testPattern(p1)
         sol.forEach {
             println(it.nodes["B"]?.properties)
@@ -137,5 +142,7 @@ class ApplicationTest {
             println(it.nodes["B"]?.properties)
             // TODO: Run distinct
         }
+
+        // TODO: Lazy?
     }
 }

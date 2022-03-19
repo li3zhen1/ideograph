@@ -180,8 +180,11 @@ class IdeographContext(
             )
         )
 
+        var batchIndices = listOf(0)
+
 
         while (true) {
+            if (solutionPool.isEmpty()) break
             val solutionToSolve = solutionPool.removeAt(0)
             if (solutionToSolve.isValid) // all solutions are evaluated
                 break
@@ -256,6 +259,21 @@ class IdeographContext(
                                 return@map solutionToSolve.copy(
                                     nodes = solutionToSolve.getUpdatedNodes(fromPattern, it),
                                     edges = solutionToSolve.getUpdatedEdges(patternEdge, correspondingEdge)
+                                )
+                            }
+                            solutionPool += filledSolutions
+                            return@firstOrNull true
+                        }
+                    } else if (fromSol.second != null) {
+                        val eCandidates = queryEdges(
+                            patternEdge.type,
+                            nodeFrom = listOf(fromSol.second!!),
+                            nodeTo = listOf(toSol.second!!))
+                        if (eCandidates.isEmpty()) return@firstOrNull false
+                        else {
+                            val filledSolutions = eCandidates.map { ec ->
+                                return@map solutionToSolve.copy(
+                                    edges = solutionToSolve.getUpdatedEdges(patternEdge, ec)
                                 )
                             }
                             solutionPool += filledSolutions
@@ -336,6 +354,18 @@ class IdeographContext(
 //        return solutions
     }
 
+//    private fun queryIfNodePairsConnected(
+//        nodePairs: List<Pair<WorkspaceNode, WorkspaceNode>>,
+//        edgeTypeName: String
+//    ): List<WorkspaceEdge?> {
+//        if (nodePairs.)
+//            return mongoService
+//                .getCollection<WorkspaceNode>(edgeTypeName + "_edge")
+//                .find(
+//
+//                )
+//    }
+
     private fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
         return mongoService
             .getCollection<WorkspaceNode>(node.type + "_node")
@@ -348,7 +378,10 @@ class IdeographContext(
             )
     }
 
-    fun queryNodeWithConstraints(node: PatternNode, vararg constraints: PatternConstraint): List<WorkspaceNode> {
+    private fun queryNodeWithConstraints(
+        node: PatternNode,
+        vararg constraints: PatternConstraint
+    ): List<WorkspaceNode> {
         // WorkspaceNode::properties.keyProjection("呼叫人*") regex "李.+",
         // WorkspaceNode::properties.keyProjection("联系电话") regex "1569755338[0-9]+",
         val find = mongoService
@@ -364,7 +397,7 @@ class IdeographContext(
         return find.toList()
     }
 
-    fun queryNodeWithConstraints(
+    private fun queryNodeWithConstraints(
         nodeTypeName: String,
         nodeIds: List<Long>,
         vararg constraints: PatternConstraint
@@ -384,14 +417,25 @@ class IdeographContext(
     }
 
 
-    fun queryEdges(
+    private fun queryEdges(
         edgeTypeName: String,
         nodeFrom: List<WorkspaceNode>? = null,
         nodeTo: List<WorkspaceNode>? = null
     ): List<WorkspaceEdge> {
 
-        val fromIds = nodeFrom?.run { WorkspaceEdge::fromId `in` map { it.nodeId } }
-        val toIds = nodeTo?.run { WorkspaceEdge::toId `in` map { it.nodeId } }
+        val fromIds = nodeFrom?.run {
+            if (nodeFrom.size == 1)
+                WorkspaceEdge::fromId eq nodeFrom[0].nodeId
+            else
+                WorkspaceEdge::fromId `in` map { it.nodeId }
+        }
+        val toIds = nodeTo?.run {
+            if (nodeTo.size == 1)
+                WorkspaceEdge::toId eq nodeTo[0].nodeId
+            else
+                WorkspaceEdge::toId `in` map { it.nodeId }
+        }
+
         val filters = listOfNotNull(fromIds, toIds)
 
         val list = mongoService
@@ -428,7 +472,7 @@ class IdeographContext(
         return toNodes
     }
 
-    @Deprecated("")
+
     fun getNodePairsByEdge(edges: List<WorkspaceEdge>): List<WorkspaceNode> {
         val groupedEdges = edges.groupBy { it.relationId }.mapKeys { relationConceptDict[it.key]?.name }
 
@@ -444,11 +488,10 @@ class IdeographContext(
 
     private fun PatternNode.getConceptId() = conceptTypeDict[this.type]?.nodeId
 
-
     val schema get() = IdeographSchema(conceptNodes, propertyNodes, hasPropertyEdges, hasRelationConceptEdges)
 
     companion object {
-        const val MONGO_NODE_LIMIT = 500;
-        const val EVALUABLE_CANDIDATE_LIMIT = 200;
+        const val MONGO_NODE_LIMIT = 10000
+        const val EVALUABLE_CANDIDATE_LIMIT = 1000
     }
 }
