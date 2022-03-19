@@ -66,6 +66,12 @@ data class PatternSolutionUnderEvaluation(
         return Pair(from, to)
     }
 
+    inline fun getNodeIndices(patternEdgeId: String): Pair<Int, Int> {
+        val from = nodes.indexOfFirst { n -> n.first == patternEdgeId }
+        val to = nodes.indexOfFirst { n -> n.first == patternEdgeId }
+        return Pair(from, to)
+    }
+
     inline fun checkEdge(patternEdge: PatternEdge) = checkTripleEvaluable(getEdgeNodeTriple(patternEdge))
 
     inline fun checkTripleEvaluable(
@@ -120,6 +126,19 @@ data class PatternSolutionUnderEvaluation(
             )
         return null
     }
+
+//    inline fun selectEdgeToEvaluateByHotNode(hotNodeIndex: Int): Int {
+//        val (fromIndex, toIndex) = getNodeIndices(edges[hotEdgeIndex])
+//    }
+
+//    inline fun selectEdgeToEvaluateByHotEdge(hotEdgeIndex: Int): Int {
+//
+//    }
+//
+//    inline fun selectEdgeToEvaluate(): Int {
+//
+//    }
+
 
     companion object {
 //        const val EDGE_EVALUATED = -1

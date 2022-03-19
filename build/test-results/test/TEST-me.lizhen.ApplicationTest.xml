@@ -1,73 +1,199 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="me.lizhen.ApplicationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-03-18T07:58:09" hostname="Craigs-MacBook-Pro.local" time="1.077">
+<testsuite name="me.lizhen.ApplicationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-03-19T12:58:17" hostname="Craigs-MacBook-Pro.local" time="4.614">
   <properties/>
-  <testcase name="getPatternJson" classname="me.lizhen.ApplicationTest" time="1.077"/>
-  <system-out><![CDATA[2022-03-18 15:58:09.953 [Test worker] INFO  org.mongodb.driver.cluster - Cluster created with settings {hosts=[162.105.88.139:27025], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms'}
-2022-03-18 15:58:09.971 [Test worker] DEBUG org.mongodb.driver.cluster - Updating cluster description to  {type=UNKNOWN, servers=[{address=162.105.88.139:27025, type=UNKNOWN, state=CONNECTING}]
-2022-03-18 15:58:10.056 [Test worker] INFO  org.mongodb.driver.cluster - Cluster description not yet available. Waiting for 30000 ms before timing out
-2022-03-18 15:58:10.174 [cluster-ClusterId{value='62343b917dd611541760d59d', description='null'}-162.105.88.139:27025] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:2, serverValue:3122}] to 162.105.88.139:27025
-2022-03-18 15:58:10.174 [cluster-rtt-ClusterId{value='62343b917dd611541760d59d', description='null'}-162.105.88.139:27025] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:1, serverValue:3121}] to 162.105.88.139:27025
-2022-03-18 15:58:10.175 [cluster-ClusterId{value='62343b917dd611541760d59d', description='null'}-162.105.88.139:27025] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=162.105.88.139:27025, type=STANDALONE, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=9, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=15568208}
-2022-03-18 15:58:10.176 [cluster-ClusterId{value='62343b917dd611541760d59d', description='null'}-162.105.88.139:27025] DEBUG org.mongodb.driver.connection - Marking the connection pool for ServerId{clusterId=ClusterId{value='62343b917dd611541760d59d', description='null'}, address=162.105.88.139:27025} as 'ready'
-2022-03-18 15:58:10.176 [MaintenanceTimer-1-thread-1] DEBUG org.mongodb.driver.connection - Pruning pooled connections to 162.105.88.139:27025
-2022-03-18 15:58:10.177 [cluster-ClusterId{value='62343b917dd611541760d59d', description='null'}-162.105.88.139:27025] DEBUG org.mongodb.driver.cluster - Updating cluster description to  {type=STANDALONE, servers=[{address=162.105.88.139:27025, type=STANDALONE, roundTripTime=15.6 ms, state=CONNECTED}]
-2022-03-18 15:58:10.177 [cluster-ClusterId{value='62343b917dd611541760d59d', description='null'}-162.105.88.139:27025] DEBUG org.mongodb.driver.cluster - Checking status of 162.105.88.139:27025
-2022-03-18 15:58:10.250 [Test worker] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:3, serverValue:3123}] to 162.105.88.139:27025
-2022-03-18 15:58:10.250 [Test worker] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:3, serverValue:3123} to server ServerId{clusterId=ClusterId{value='62343b917dd611541760d59d', description='null'}, address=162.105.88.139:27025} is now open
-2022-03-18 15:58:10.262 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "relation_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "nNQcsKWCTVyiQOqNpzhnBA==", "subType": "04"}}}}' with request id 6 to database relation on connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.302 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 6 completed successfully in 46.37 ms on connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.399 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 66 documents with cursorId 0 from server 162.105.88.139:27025
-2022-03-18 15:58:10.400 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.531 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
-2022-03-18 15:58:10.534 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
-2022-03-18 15:58:10.537 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=1000}
-2022-03-18 15:58:10.538 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND SETTINGS: ack=true
-2022-03-18 15:58:10.538 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND SETTINGS: ack=true
-2022-03-18 15:58:10.546 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 162.105.88.139:19482, :path: /api.Dgraph/Alter, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.34.1, grpc-accept-encoding: gzip] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
-2022-03-18 15:58:10.549 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=1956 bytes=000000079f0a9a0f3c6e6f646549643e3a20696e742040696e64657828696e7429202e0a3c74797065733e3a20737472696e672040696e646578286861736829...
-2022-03-18 15:58:10.556 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=1956
-2022-03-18 15:58:10.556 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND PING: ack=false bytes=145258749040133895
-2022-03-18 15:58:10.556 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND PING: ack=true bytes=145258749040133895
-2022-03-18 15:58:10.570 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=3 headers=GrpcHttp2ResponseHeaders[:status: 200, content-type: application/grpc] padding=0 endStream=false
-2022-03-18 15:58:10.571 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND DATA: streamId=3 padding=0 endStream=false length=5 bytes=0000000000
-2022-03-18 15:58:10.571 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND PING: ack=false bytes=1234
-2022-03-18 15:58:10.572 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=3 headers=GrpcHttp2ResponseHeaders[grpc-status: 0, grpc-message: ] padding=0 endStream=true
-2022-03-18 15:58:10.579 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND PING: ack=true bytes=1234
-2022-03-18 15:58:10.595 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND HEADERS: streamId=5 headers=GrpcHttp2OutboundHeaders[:authority: 162.105.88.139:19482, :path: /api.Dgraph/Query, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.34.1, grpc-accept-encoding: gzip] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
-2022-03-18 15:58:10.596 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND DATA: streamId=5 padding=0 endStream=true length=36 bytes=000000001f221d71756572797b6e6f64652866756e633a207569642830783129297b7d7d
-2022-03-18 15:58:10.602 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=36
-2022-03-18 15:58:10.602 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND PING: ack=false bytes=145258749040133895
-2022-03-18 15:58:10.602 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND PING: ack=true bytes=145258749040133895
-2022-03-18 15:58:10.612 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=5 headers=GrpcHttp2ResponseHeaders[:status: 200, content-type: application/grpc, dgraph-toucheduids: 1] padding=0 endStream=false
-2022-03-18 15:58:10.612 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND DATA: streamId=5 padding=0 endStream=false length=66 bytes=000000003d0a0b7b226e6f6465223a5b5d7d12040887f4271a1408cba70510c7a30418faa60320b4872328f9dc3522120a040a0010010a0a0a065f746f74616c...
-2022-03-18 15:58:10.612 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] OUTBOUND PING: ack=false bytes=1234
-2022-03-18 15:58:10.613 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=5 headers=GrpcHttp2ResponseHeaders[grpc-status: 0, grpc-message: ] padding=0 endStream=true
-2022-03-18 15:58:10.616 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x897bb1d5, L:/10.0.163.130:50343 - R:/162.105.88.139:19482] INBOUND PING: ack=true bytes=1234
-2022-03-18 15:58:10.630 [DefaultDispatcher-worker-1 @coroutine#1] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "concept_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "nNQcsKWCTVyiQOqNpzhnBA==", "subType": "04"}}}}' with request id 7 to database relation on connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.652 [DefaultDispatcher-worker-1 @coroutine#1] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 7 completed successfully in 22.27 ms on connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.669 [DefaultDispatcher-worker-1 @coroutine#1] DEBUG org.mongodb.driver.operation - Received batch of 94 documents with cursorId 0 from server 162.105.88.139:27025
-2022-03-18 15:58:10.670 [DefaultDispatcher-worker-1 @coroutine#1] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.670 [DefaultDispatcher-worker-1 @coroutine#1] TRACE org.mongodb.driver.connection - Handed over opened connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.670 [DefaultDispatcher-worker-4 @coroutine#4] TRACE org.mongodb.driver.connection - Received opened connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.670 [DefaultDispatcher-worker-4 @coroutine#4] TRACE org.mongodb.driver.connection - Silently closed connection [connectionId{localValue:7}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.670 [DefaultDispatcher-worker-4 @coroutine#4] DEBUG org.mongodb.driver.connection - Closing connection connectionId{localValue:7}
-2022-03-18 15:58:10.672 [DefaultDispatcher-worker-4 @coroutine#4] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "hasRelationConcept_edge", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "nNQcsKWCTVyiQOqNpzhnBA==", "subType": "04"}}}}' with request id 12 to database relation on connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.696 [DefaultDispatcher-worker-3 @coroutine#5] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:6, serverValue:3124}] to 162.105.88.139:27025
-2022-03-18 15:58:10.696 [DefaultDispatcher-worker-2 @coroutine#2] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:5, serverValue:3125}] to 162.105.88.139:27025
-2022-03-18 15:58:10.696 [DefaultDispatcher-worker-3 @coroutine#5] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:6, serverValue:3124} to server ServerId{clusterId=ClusterId{value='62343b917dd611541760d59d', description='null'}, address=162.105.88.139:27025} is now open
-2022-03-18 15:58:10.696 [DefaultDispatcher-worker-2 @coroutine#2] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:5, serverValue:3125} to server ServerId{clusterId=ClusterId{value='62343b917dd611541760d59d', description='null'}, address=162.105.88.139:27025} is now open
-2022-03-18 15:58:10.697 [DefaultDispatcher-worker-2 @coroutine#2] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "property_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "TS5HhtknSp+kDzJiSNLg0Q==", "subType": "04"}}}}' with request id 14 to database relation on connection [connectionId{localValue:5, serverValue:3125}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.697 [DefaultDispatcher-worker-3 @coroutine#5] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "hasProperty_edge", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "+s5kcKaoRoyL4BJ9u43wKA==", "subType": "04"}}}}' with request id 13 to database relation on connection [connectionId{localValue:6, serverValue:3124}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.703 [DefaultDispatcher-worker-4 @coroutine#4] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 12 completed successfully in 32.24 ms on connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.735 [DefaultDispatcher-worker-2 @coroutine#2] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 14 completed successfully in 38.65 ms on connection [connectionId{localValue:5, serverValue:3125}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.735 [DefaultDispatcher-worker-3 @coroutine#5] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 13 completed successfully in 38.59 ms on connection [connectionId{localValue:6, serverValue:3124}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.741 [DefaultDispatcher-worker-5 @coroutine#3] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:4, serverValue:3126}] to 162.105.88.139:27025
-2022-03-18 15:58:10.741 [DefaultDispatcher-worker-5 @coroutine#3] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:4, serverValue:3126} to server ServerId{clusterId=ClusterId{value='62343b917dd611541760d59d', description='null'}, address=162.105.88.139:27025} is now open
-2022-03-18 15:58:10.742 [DefaultDispatcher-worker-5 @coroutine#3] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "relation_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "dDtqqhclSqWQSpR+q4saFw==", "subType": "04"}}}}' with request id 17 to database relation on connection [connectionId{localValue:4, serverValue:3126}] to server 162.105.88.139:27025
-2022-03-18 15:58:10.749 [DefaultDispatcher-worker-4 @coroutine#4] DEBUG org.mongodb.driver.operation - Received batch of 101 documents with cursorId 6748394207882403067 from server 162.105.88.139:27025
-2022-03-18 15:58:10.749 [DefaultDispatcher-worker-4 @coroutine#4] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
-{"nodes":[{"patternId":"A","type":"报警人"},{"patternId":"B","type":"急救报警"},{"patternId":"C","type":"急救报警"}],"edges":[{"patternId":"e0","type":"发起","fromPatternId":"A","toPatternId":"B"},{"patternId":"e2","type":"发起","fromPatternId":"A","toPatternId":"C"}],"constraints":[{"patternId":"c0","targetType":"Node","targetPatternId":"A","property":"呼叫人*","operator":"MatchRegex","value":"李.+"},{"patternId":"c1","targetType":"Node","targetPatternId":"A","property":"联系电话","operator":"MatchRegex","value":"15[0-9].+"},{"patternId":"c2","targetType":"Node","targetPatternId":"B","property":"流水号*","operator":"MatchRegex","value":"2019[0-9]+"}]}
-2022-03-18 15:58:10.750 [DefaultDispatcher-worker-4 @coroutine#4] DEBUG org.mongodb.driver.protocol.command - Sending command '{"getMore": 6748394207882403067, "collection": "hasRelationConcept_edge", "$db": "relation", "lsid": {"id": {"$binary": {"base64": "nNQcsKWCTVyiQOqNpzhnBA==", "subType": "04"}}}}' with request id 18 to database relation on connection [connectionId{localValue:3, serverValue:3123}] to server 162.105.88.139:27025
+  <testcase name="testRoot" classname="me.lizhen.ApplicationTest" time="4.614"/>
+  <system-out><![CDATA[2022-03-19 20:58:17.480 [Test worker] INFO  org.mongodb.driver.cluster - Cluster created with settings {hosts=[162.105.88.139:27025], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms'}
+2022-03-19 20:58:17.496 [Test worker] DEBUG org.mongodb.driver.cluster - Updating cluster description to  {type=UNKNOWN, servers=[{address=162.105.88.139:27025, type=UNKNOWN, state=CONNECTING}]
+2022-03-19 20:58:17.542 [cluster-ClusterId{value='6235d36916d5431de321f9c1', description='null'}-162.105.88.139:27025] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:2, serverValue:3346}] to 162.105.88.139:27025
+2022-03-19 20:58:17.542 [cluster-rtt-ClusterId{value='6235d36916d5431de321f9c1', description='null'}-162.105.88.139:27025] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:1, serverValue:3345}] to 162.105.88.139:27025
+2022-03-19 20:58:17.542 [cluster-ClusterId{value='6235d36916d5431de321f9c1', description='null'}-162.105.88.139:27025] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=162.105.88.139:27025, type=STANDALONE, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=9, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=21333833}
+2022-03-19 20:58:17.544 [cluster-ClusterId{value='6235d36916d5431de321f9c1', description='null'}-162.105.88.139:27025] DEBUG org.mongodb.driver.connection - Marking the connection pool for ServerId{clusterId=ClusterId{value='6235d36916d5431de321f9c1', description='null'}, address=162.105.88.139:27025} as 'ready'
+2022-03-19 20:58:17.544 [MaintenanceTimer-1-thread-1] DEBUG org.mongodb.driver.connection - Pruning pooled connections to 162.105.88.139:27025
+2022-03-19 20:58:17.545 [cluster-ClusterId{value='6235d36916d5431de321f9c1', description='null'}-162.105.88.139:27025] DEBUG org.mongodb.driver.cluster - Updating cluster description to  {type=STANDALONE, servers=[{address=162.105.88.139:27025, type=STANDALONE, roundTripTime=21.3 ms, state=CONNECTED}]
+2022-03-19 20:58:17.545 [cluster-ClusterId{value='6235d36916d5431de321f9c1', description='null'}-162.105.88.139:27025] DEBUG org.mongodb.driver.cluster - Checking status of 162.105.88.139:27025
+2022-03-19 20:58:17.723 [Test worker] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:3, serverValue:3347}] to 162.105.88.139:27025
+2022-03-19 20:58:17.723 [Test worker] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:3, serverValue:3347} to server ServerId{clusterId=ClusterId{value='6235d36916d5431de321f9c1', description='null'}, address=162.105.88.139:27025} is now open
+2022-03-19 20:58:17.735 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "relation_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "J/QSiDlPTjSlHJf4C0GQlw==", "subType": "04"}}}}' with request id 6 to database relation on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:17.756 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 6 completed successfully in 27.83 ms on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:17.855 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 66 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:17.856 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:17.964 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+2022-03-19 20:58:17.968 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+2022-03-19 20:58:17.971 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=1000}
+2022-03-19 20:58:17.971 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND SETTINGS: ack=true
+2022-03-19 20:58:17.972 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND SETTINGS: ack=true
+2022-03-19 20:58:17.980 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: 162.105.88.139:19482, :path: /api.Dgraph/Alter, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.34.1, grpc-accept-encoding: gzip] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+2022-03-19 20:58:17.983 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=1956 bytes=000000079f0a9a0f3c6e6f646549643e3a20696e742040696e64657828696e7429202e0a3c74797065733e3a20737472696e672040696e646578286861736829...
+2022-03-19 20:58:17.989 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=1956
+2022-03-19 20:58:17.989 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND PING: ack=false bytes=145258749040133895
+2022-03-19 20:58:17.990 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND PING: ack=true bytes=145258749040133895
+2022-03-19 20:58:18.000 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=3 headers=GrpcHttp2ResponseHeaders[:status: 200, content-type: application/grpc] padding=0 endStream=false
+2022-03-19 20:58:18.001 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND DATA: streamId=3 padding=0 endStream=false length=5 bytes=0000000000
+2022-03-19 20:58:18.001 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND PING: ack=false bytes=1234
+2022-03-19 20:58:18.002 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=3 headers=GrpcHttp2ResponseHeaders[grpc-status: 0, grpc-message: ] padding=0 endStream=true
+2022-03-19 20:58:18.014 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND PING: ack=true bytes=1234
+2022-03-19 20:58:18.023 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND HEADERS: streamId=5 headers=GrpcHttp2OutboundHeaders[:authority: 162.105.88.139:19482, :path: /api.Dgraph/Query, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.34.1, grpc-accept-encoding: gzip] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+2022-03-19 20:58:18.024 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND DATA: streamId=5 padding=0 endStream=true length=36 bytes=000000001f221d71756572797b6e6f64652866756e633a207569642830783129297b7d7d
+2022-03-19 20:58:18.028 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=36
+2022-03-19 20:58:18.028 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND PING: ack=false bytes=145258749040133895
+2022-03-19 20:58:18.028 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND PING: ack=true bytes=145258749040133895
+2022-03-19 20:58:18.031 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=5 headers=GrpcHttp2ResponseHeaders[:status: 200, content-type: application/grpc, dgraph-toucheduids: 1] padding=0 endStream=false
+2022-03-19 20:58:18.031 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND DATA: streamId=5 padding=0 endStream=false length=66 bytes=000000003d0a0b7b226e6f6465223a5b5d7d120408bcf4271a14088af30510e2db0318d5e5012084fd31289eef4222120a040a0010010a0a0a065f746f74616c...
+2022-03-19 20:58:18.031 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] OUTBOUND PING: ack=false bytes=1234
+2022-03-19 20:58:18.031 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND HEADERS: streamId=5 headers=GrpcHttp2ResponseHeaders[grpc-status: 0, grpc-message: ] padding=0 endStream=true
+2022-03-19 20:58:18.036 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0x9c0a0a9c, L:/10.0.163.130:52369 - R:/162.105.88.139:19482] INBOUND PING: ack=true bytes=1234
+2022-03-19 20:58:18.050 [DefaultDispatcher-worker-2 @coroutine#3] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "relation_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "J/QSiDlPTjSlHJf4C0GQlw==", "subType": "04"}}}}' with request id 7 to database relation on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.061 [DefaultDispatcher-worker-2 @coroutine#3] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 7 completed successfully in 11.96 ms on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.066 [DefaultDispatcher-worker-2 @coroutine#3] DEBUG org.mongodb.driver.operation - Received batch of 66 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:18.067 [DefaultDispatcher-worker-2 @coroutine#3] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.067 [DefaultDispatcher-worker-2 @coroutine#3] TRACE org.mongodb.driver.connection - Handed over opened connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.067 [DefaultDispatcher-worker-6 @coroutine#5] TRACE org.mongodb.driver.connection - Received opened connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.067 [DefaultDispatcher-worker-6 @coroutine#5] TRACE org.mongodb.driver.connection - Silently closed connection [connectionId{localValue:5}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.067 [DefaultDispatcher-worker-6 @coroutine#5] DEBUG org.mongodb.driver.connection - Closing connection connectionId{localValue:5}
+2022-03-19 20:58:18.068 [DefaultDispatcher-worker-6 @coroutine#5] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "hasProperty_edge", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "J/QSiDlPTjSlHJf4C0GQlw==", "subType": "04"}}}}' with request id 10 to database relation on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.082 [DefaultDispatcher-worker-6 @coroutine#5] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 10 completed successfully in 14.24 ms on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.089 [DefaultDispatcher-worker-5 @coroutine#4] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:7, serverValue:3349}] to 162.105.88.139:27025
+2022-03-19 20:58:18.089 [DefaultDispatcher-worker-3 @coroutine#2] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:6, serverValue:3348}] to 162.105.88.139:27025
+2022-03-19 20:58:18.089 [DefaultDispatcher-worker-5 @coroutine#4] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:7, serverValue:3349} to server ServerId{clusterId=ClusterId{value='6235d36916d5431de321f9c1', description='null'}, address=162.105.88.139:27025} is now open
+2022-03-19 20:58:18.089 [DefaultDispatcher-worker-3 @coroutine#2] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:6, serverValue:3348} to server ServerId{clusterId=ClusterId{value='6235d36916d5431de321f9c1', description='null'}, address=162.105.88.139:27025} is now open
+2022-03-19 20:58:18.090 [DefaultDispatcher-worker-3 @coroutine#2] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "property_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 14 to database relation on connection [connectionId{localValue:6, serverValue:3348}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.090 [DefaultDispatcher-worker-5 @coroutine#4] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "hasRelationConcept_edge", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "xA86IWBBTtaEDpcMWh1yyA==", "subType": "04"}}}}' with request id 13 to database relation on connection [connectionId{localValue:7, serverValue:3349}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.095 [DefaultDispatcher-worker-6 @coroutine#5] DEBUG org.mongodb.driver.operation - Received batch of 101 documents with cursorId 534849233954691688 from server 162.105.88.139:27025
+2022-03-19 20:58:18.095 [DefaultDispatcher-worker-6 @coroutine#5] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.096 [DefaultDispatcher-worker-6 @coroutine#5] DEBUG org.mongodb.driver.protocol.command - Sending command '{"getMore": 534849233954691688, "collection": "hasProperty_edge", "$db": "relation", "lsid": {"id": {"$binary": {"base64": "J/QSiDlPTjSlHJf4C0GQlw==", "subType": "04"}}}}' with request id 17 to database relation on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.107 [DefaultDispatcher-worker-3 @coroutine#2] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 14 completed successfully in 17.82 ms on connection [connectionId{localValue:6, serverValue:3348}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.107 [DefaultDispatcher-worker-6 @coroutine#5] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 17 completed successfully in 11.36 ms on connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.108 [DefaultDispatcher-worker-6 @coroutine#5] DEBUG org.mongodb.driver.operation - Received batch of 7 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:18.108 [DefaultDispatcher-worker-6 @coroutine#5] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:3, serverValue:3347}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.120 [DefaultDispatcher-worker-5 @coroutine#4] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 13 completed successfully in 30.10 ms on connection [connectionId{localValue:7, serverValue:3349}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.122 [DefaultDispatcher-worker-3 @coroutine#2] DEBUG org.mongodb.driver.operation - Received batch of 101 documents with cursorId 8206533256587132825 from server 162.105.88.139:27025
+2022-03-19 20:58:18.122 [DefaultDispatcher-worker-3 @coroutine#2] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:6, serverValue:3348}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.122 [DefaultDispatcher-worker-3 @coroutine#2] DEBUG org.mongodb.driver.protocol.command - Sending command '{"getMore": 8206533256587132825, "collection": "property_node", "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 18 to database relation on connection [connectionId{localValue:6, serverValue:3348}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.131 [DefaultDispatcher-worker-5 @coroutine#4] DEBUG org.mongodb.driver.operation - Received batch of 101 documents with cursorId 3067088690140799689 from server 162.105.88.139:27025
+2022-03-19 20:58:18.131 [DefaultDispatcher-worker-5 @coroutine#4] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:7, serverValue:3349}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.131 [DefaultDispatcher-worker-5 @coroutine#4] DEBUG org.mongodb.driver.protocol.command - Sending command '{"getMore": 3067088690140799689, "collection": "hasRelationConcept_edge", "$db": "relation", "lsid": {"id": {"$binary": {"base64": "xA86IWBBTtaEDpcMWh1yyA==", "subType": "04"}}}}' with request id 21 to database relation on connection [connectionId{localValue:7, serverValue:3349}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.133 [DefaultDispatcher-worker-3 @coroutine#2] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 18 completed successfully in 10.43 ms on connection [connectionId{localValue:6, serverValue:3348}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.134 [DefaultDispatcher-worker-1 @coroutine#1] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:4, serverValue:3350}] to 162.105.88.139:27025
+2022-03-19 20:58:18.134 [DefaultDispatcher-worker-1 @coroutine#1] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:4, serverValue:3350} to server ServerId{clusterId=ClusterId{value='6235d36916d5431de321f9c1', description='null'}, address=162.105.88.139:27025} is now open
+2022-03-19 20:58:18.134 [DefaultDispatcher-worker-1 @coroutine#1] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "concept_node", "filter": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "J/QSiDlPTjSlHJf4C0GQlw==", "subType": "04"}}}}' with request id 22 to database relation on connection [connectionId{localValue:4, serverValue:3350}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.134 [DefaultDispatcher-worker-3 @coroutine#2] DEBUG org.mongodb.driver.operation - Received batch of 44 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:18.135 [DefaultDispatcher-worker-3 @coroutine#2] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:6, serverValue:3348}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.135 [Test worker] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:8, serverValue:3351}] to 162.105.88.139:27025
+2022-03-19 20:58:18.135 [Test worker] TRACE org.mongodb.driver.connection - Pooled connection connectionId{localValue:8, serverValue:3351} to server ServerId{clusterId=ClusterId{value='6235d36916d5431de321f9c1', description='null'}, address=162.105.88.139:27025} is now open
+2022-03-19 20:58:18.138 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"aggregate": "报警人_node", "pipeline": [{"$match": {"$and": [{"properties.呼叫人*": {"$regularExpression": {"pattern": "李.+", "options": ""}}}, {"properties.联系电话": {"$regularExpression": {"pattern": "15[0-9].+", "options": ""}}}]}}, {"$group": {"_id": 1, "n": {"$sum": 1}}}], "cursor": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 23 to database relation on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.146 [DefaultDispatcher-worker-5 @coroutine#4] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 21 completed successfully in 14.61 ms on connection [connectionId{localValue:7, serverValue:3349}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.148 [DefaultDispatcher-worker-5 @coroutine#4] DEBUG org.mongodb.driver.operation - Received batch of 66 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:18.148 [DefaultDispatcher-worker-5 @coroutine#4] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:7, serverValue:3349}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.176 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 23 completed successfully in 39.36 ms on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.176 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 1 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:18.177 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.178 [DefaultDispatcher-worker-1 @coroutine#1] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 22 completed successfully in 43.92 ms on connection [connectionId{localValue:4, serverValue:3350}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.180 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"aggregate": "急救报警_node", "pipeline": [{"$match": {}}, {"$group": {"_id": 1, "n": {"$sum": 1}}}], "cursor": {}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 24 to database relation on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:18.190 [DefaultDispatcher-worker-1 @coroutine#1] DEBUG org.mongodb.driver.operation - Received batch of 94 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:18.190 [DefaultDispatcher-worker-1 @coroutine#1] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:4, serverValue:3350}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.692 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 24 completed successfully in 3510.33 ms on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.694 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 1 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:21.694 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.706 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "报警人_node", "filter": {"$and": [{"properties.呼叫人*": {"$regularExpression": {"pattern": "李.+", "options": ""}}}, {"properties.联系电话": {"$regularExpression": {"pattern": "15[0-9].+", "options": ""}}}]}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 25 to database relation on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.720 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 25 completed successfully in 13.74 ms on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.725 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 5 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:21.725 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.726 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "报警人_node", "filter": {"$and": [{"properties.呼叫人*": {"$regularExpression": {"pattern": "李.+", "options": ""}}}, {"properties.联系电话": {"$regularExpression": {"pattern": "15[0-9].+", "options": ""}}}]}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 26 to database relation on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.741 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 26 completed successfully in 15.30 ms on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.741 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 5 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:21.742 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.752 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "发起_edge", "filter": {"fromId": {"$in": [19031263, 60210513, 79492509, 76398919, 110468421]}}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 27 to database relation on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.757 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 27 completed successfully in 5.63 ms on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.759 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 15 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:21.759 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.762 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "急救报警_node", "filter": {"nodeId": {"$in": [19031257, 20014352, 21139820, 23313275, 23564620, 26793972, 60210508, 76398914, 76663994, 80190934, 81060282, 84783593, 85670073, 79492503, 110468415]}}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 28 to database relation on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.770 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 28 completed successfully in 7.99 ms on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.771 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 15 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:21.771 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.771 [Test worker] DEBUG org.mongodb.driver.protocol.command - Sending command '{"find": "急救报警_node", "filter": {"nodeId": {"$in": [19031257, 20014352, 21139820, 23313275, 23564620, 26793972, 60210508, 76398914, 76663994, 80190934, 81060282, 84783593, 85670073, 79492503, 110468415]}}, "$db": "relation", "lsid": {"id": {"$binary": {"base64": "qpPehNRRTzueyOBgpx2eJg==", "subType": "04"}}}}' with request id 29 to database relation on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.807 [Test worker] DEBUG org.mongodb.driver.protocol.command - Execution of command with request id 29 completed successfully in 36.28 ms on connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+2022-03-19 20:58:21.808 [Test worker] DEBUG org.mongodb.driver.operation - Received batch of 15 documents with cursorId 0 from server 162.105.88.139:27025
+2022-03-19 20:58:21.808 [Test worker] TRACE org.mongodb.driver.connection - Checked in connection [connectionId{localValue:8, serverValue:3351}] to server 162.105.88.139:27025
+
+
+
+
+3.760284291s, 75
+{流水号*=2015102800000001791}
+{流水号*=2015062100000000753}
+{流水号*=2015122000000001531}
+{流水号*=2015031600000001601}
+{流水号*=2015032300000001142}
+{流水号*=2015092600000000819}
+{流水号*=2017110400000001705}
+{流水号*=2019081100000001277}
+{流水号*=2019081700000000055}
+{流水号*=2018060600000001398}
+{流水号*=2019021000000000264}
+{流水号*=2019030800000001092}
+{流水号*=2019062600000001318}
+{流水号*=2019101500000001734}
+{流水号*=2012051100000001073}
+{流水号*=2015102800000001791}
+{流水号*=2015062100000000753}
+{流水号*=2015122000000001531}
+{流水号*=2015031600000001601}
+{流水号*=2015032300000001142}
+{流水号*=2015092600000000819}
+{流水号*=2017110400000001705}
+{流水号*=2019081100000001277}
+{流水号*=2019081700000000055}
+{流水号*=2018060600000001398}
+{流水号*=2019021000000000264}
+{流水号*=2019030800000001092}
+{流水号*=2019062600000001318}
+{流水号*=2019101500000001734}
+{流水号*=2012051100000001073}
+{流水号*=2015102800000001791}
+{流水号*=2015062100000000753}
+{流水号*=2015122000000001531}
+{流水号*=2015031600000001601}
+{流水号*=2015032300000001142}
+{流水号*=2015092600000000819}
+{流水号*=2017110400000001705}
+{流水号*=2019081100000001277}
+{流水号*=2019081700000000055}
+{流水号*=2018060600000001398}
+{流水号*=2019021000000000264}
+{流水号*=2019030800000001092}
+{流水号*=2019062600000001318}
+{流水号*=2019101500000001734}
+{流水号*=2012051100000001073}
+{流水号*=2015102800000001791}
+{流水号*=2015062100000000753}
+{流水号*=2015122000000001531}
+{流水号*=2015031600000001601}
+{流水号*=2015032300000001142}
+{流水号*=2015092600000000819}
+{流水号*=2017110400000001705}
+{流水号*=2019081100000001277}
+{流水号*=2019081700000000055}
+{流水号*=2018060600000001398}
+{流水号*=2019021000000000264}
+{流水号*=2019030800000001092}
+{流水号*=2019062600000001318}
+{流水号*=2019101500000001734}
+{流水号*=2012051100000001073}
+{流水号*=2015102800000001791}
+{流水号*=2015062100000000753}
+{流水号*=2015122000000001531}
+{流水号*=2015031600000001601}
+{流水号*=2015032300000001142}
+{流水号*=2015092600000000819}
+{流水号*=2017110400000001705}
+{流水号*=2019081100000001277}
+{流水号*=2019081700000000055}
+{流水号*=2018060600000001398}
+{流水号*=2019021000000000264}
+{流水号*=2019030800000001092}
+{流水号*=2019062600000001318}
+{流水号*=2019101500000001734}
+{流水号*=2012051100000001073}
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

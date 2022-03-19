@@ -17,6 +17,7 @@ import me.lizhen.service.DgraphService
 import me.lizhen.service.MongoService
 import me.lizhen.solvers.IdeographContext
 import me.lizhen.solvers.PatternSolution
+import me.lizhen.solvers.solvePatternBatched
 import me.lizhen.solvers.validate
 import org.litote.kmongo.json
 import kotlin.time.*
@@ -113,7 +114,7 @@ class ApplicationTest {
 
         var solutions: List<PatternSolution>
         val time = measureTime {
-            solutions = ctx.solvePattern(pattern)
+            solutions = ctx.solvePatternBatched(pattern)
         }
         println("\n\n\n\n$time, ${solutions.size}")
         return solutions
@@ -132,17 +133,18 @@ class ApplicationTest {
         }
 
 
-        val sol2 = testPattern(p2)
-        sol2.forEach {
-            println(it.nodes["B"]?.properties)
-        }
-
-        val sol3 = testPattern(p3)
-        sol3.forEach {
-            println(it.nodes["B"]?.properties)
-            // TODO: Run distinct
-        }
+//        val sol2 = testPattern(p2)
+//        sol2.forEach {
+//            println(it.nodes["B"]?.properties)
+//        }
+//
+//        val sol3 = testPattern(p3)
+//        sol3.forEach {
+//            println(it.nodes["B"]?.properties)
+//            // TODO: Run distinct
+//        }
 
         // TODO: Lazy?
     }
+
 }
