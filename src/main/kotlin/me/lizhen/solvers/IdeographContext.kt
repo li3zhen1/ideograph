@@ -102,6 +102,16 @@ data class PatternSolutionUnderEvaluation(
         }.toList()
     }
 
+    inline fun getUpdatedNodes(
+        maps: List<Pair<String, WorkspaceNode?>>
+    ): List<Pair<String, WorkspaceNode?>> {
+        return nodes.toMap().toMutableMap().apply {
+            maps.forEach { (patternId, value) ->
+                this[patternId] = value
+            }
+        }.toList()
+    }
+
     inline fun completed(): PatternSolution? {
         if (isValid)
             return PatternSolution(
@@ -354,6 +364,9 @@ class IdeographContext(
 //        return solutions
     }
 
+
+
+
 //    private fun queryIfNodePairsConnected(
 //        nodePairs: List<Pair<WorkspaceNode, WorkspaceNode>>,
 //        edgeTypeName: String
@@ -366,7 +379,7 @@ class IdeographContext(
 //                )
 //    }
 
-    private fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
+    fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
         return mongoService
             .getCollection<WorkspaceNode>(node.type + "_node")
             .countDocuments(
@@ -378,7 +391,7 @@ class IdeographContext(
             )
     }
 
-    private fun queryNodeWithConstraints(
+    fun queryNodeWithConstraints(
         node: PatternNode,
         vararg constraints: PatternConstraint
     ): List<WorkspaceNode> {
@@ -397,7 +410,7 @@ class IdeographContext(
         return find.toList()
     }
 
-    private fun queryNodeWithConstraints(
+    fun queryNodeWithConstraints(
         nodeTypeName: String,
         nodeIds: List<Long>,
         vararg constraints: PatternConstraint
@@ -417,7 +430,7 @@ class IdeographContext(
     }
 
 
-    private fun queryEdges(
+    fun queryEdges(
         edgeTypeName: String,
         nodeFrom: List<WorkspaceNode>? = null,
         nodeTo: List<WorkspaceNode>? = null
