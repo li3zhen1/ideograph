@@ -434,30 +434,39 @@ class IdeographContext(
         edgeTypeName: String,
         nodeFrom: List<WorkspaceNode>? = null,
         nodeTo: List<WorkspaceNode>? = null
+    ): List<WorkspaceEdge> = queryEdgesByNodeId(
+        edgeTypeName,
+        nodeFrom?.map { it.nodeId },
+        nodeTo?.map { it.nodeId }
+    )
+
+
+    fun queryEdgesByNodeId(
+        edgeTypeName: String,
+        nodeFrom: List<Long>? = null,
+        nodeTo: List<Long>? = null
     ): List<WorkspaceEdge> {
 
         val fromIds = nodeFrom?.run {
             if (nodeFrom.size == 1)
-                WorkspaceEdge::fromId eq nodeFrom[0].nodeId
+                WorkspaceEdge::fromId eq nodeFrom[0]
             else
-                WorkspaceEdge::fromId `in` map { it.nodeId }
+                WorkspaceEdge::fromId `in` this
         }
         val toIds = nodeTo?.run {
             if (nodeTo.size == 1)
-                WorkspaceEdge::toId eq nodeTo[0].nodeId
+                WorkspaceEdge::toId eq nodeTo[0]
             else
-                WorkspaceEdge::toId `in` map { it.nodeId }
+                WorkspaceEdge::toId `in` this
         }
 
         val filters = listOfNotNull(fromIds, toIds)
 
-        val list = mongoService
+        return mongoService
             .database
             .getCollection<WorkspaceEdge>(edgeTypeName + "_edge")
             .find(and(filters))
             .toList()
-
-        return list
     }
 
     private fun getEdgeTypeCandidates(from: PatternNode, to: PatternNode) = hasRelationConceptEdges.filter {
