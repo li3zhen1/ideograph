@@ -1,30 +1,20 @@
 package me.lizhen.service
 
 import com.mongodb.*
-import org.litote.kmongo.*
-import org.litote.kmongo.reactivestreams.*  //NEEDED! import KMongo reactivestreams extensions
+import org.litote.kmongo.reactivestreams.*
 import org.litote.kmongo.coroutine.*
 
-
-data class DriverNode(
-    val name: String,
-    val nodeId: Long
-)
-
 class MongoService(
-    private val hostAddr: String = "162.105.88.139",
-    private val port: Int = 27025,
-    private val userName: String = "rootxyx",
-    private val password: String = "woxnsk!",
-    private val databaseName: String = "relation"
+    hostAddress: String = "162.105.88.139",
+    port: Int = 27025,
+    userName: String = "rootxyx",
+    password: String = "woxnsk!",
+    databaseName: String = "relation"
 ) {
-    private val settings = createMongoClientSetting(userName, password, hostAddr, port)
-    val client = KMongo.createClient(settings).coroutine
-    val database = client.getDatabase(databaseName)
+    private val settings = createMongoClientSetting(userName, password, hostAddress, port)
+    public val client = KMongo.createClient(settings).coroutine
+    public val database = client.getDatabase(databaseName)
 
-    fun test() {
-        val collection = database.getCollection<DriverNode>()
-    }
 
     inline fun <reified T : Any>getCollection(name: String) = database.getCollection<T>(name)
 
@@ -32,12 +22,12 @@ class MongoService(
         private fun createMongoClientSetting(
             userName: String,
             password: String,
-            hostAddr: String,
+            hostAddress: String,
             port: Int
         ) = MongoClientSettings.builder()
             .apply {
                 applyConnectionString(
-                    ConnectionString("mongodb://${userName}:${password}@${hostAddr}:${port}")
+                    ConnectionString("mongodb://${userName}:${password}@${hostAddress}:${port}")
                 )
                 credential(
                     MongoCredential.createCredential(userName, "relation", password.toCharArray())

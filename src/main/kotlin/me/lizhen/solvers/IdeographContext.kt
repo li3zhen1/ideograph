@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import me.lizhen.schema.*
 import me.lizhen.service.DgraphService
 import me.lizhen.service.MongoService
-
 import org.litote.kmongo.*
 
 
@@ -51,7 +50,7 @@ data class PatternSolutionUnderEvaluation(
 ) {
     inline val isValid get() = nodes.all { it.second != null } && edges.all { it.second != null }
 
-    inline fun getNode(patternNode: PatternNode) = nodes.firstOrNull { n -> n.first == patternNode.patternId }
+//    inline fun getNode(patternNode: PatternNode) = nodes.firstOrNull { n -> n.first == patternNode.patternId }
     inline fun getEdge(patternEdge: PatternEdge) = nodes.firstOrNull { n -> n.first == patternEdge.patternId }
     inline fun getEdgeNodeTriple(patternEdge: PatternEdge):
             Triple<Pair<String, WorkspaceNode?>?, Pair<String, WorkspaceNode?>?, Pair<String, WorkspaceNode?>?> {
@@ -106,7 +105,7 @@ data class PatternSolutionUnderEvaluation(
         val index = nodes.indexOfFirst { e -> e.first == patternNode.patternId }
         return nodes.toMutableList().apply {
             set(index, Pair(patternNode.patternId, workspaceNode))
-        }.toList()
+        }
     }
 
     inline fun getUpdatedNodes(
@@ -162,8 +161,8 @@ fun List<PatternConstraint>?.validate(workspaceNode: WorkspaceNode): Boolean {
 
 @Suppress("CANDIDATE_CHOSEN_USING_OVERLOAD_RESOLUTION_BY_LAMBDA_ANNOTATION")
 class IdeographContext(
-    public val mongoService: MongoService,
-    public val dgraphService: DgraphService
+    val mongoService: MongoService,
+    val dgraphService: DgraphService
 ) {
     init {
         initializeSchema()
@@ -434,7 +433,7 @@ class IdeographContext(
                         WorkspaceNode::properties.keyProjection(it.property) regex it.value
                     }
                 )
-            );
+            )
 //        if (find.count() > MONGO_NODE_LIMIT) throw Error("Query maximum exceeded.")
         return find.toList()
     }
@@ -498,7 +497,8 @@ class IdeographContext(
             .toList()
     }
 
-    private fun getEdgeTypeCandidates(from: PatternNode, to: PatternNode) = hasRelationConceptEdges.filter {
+    @Deprecated("use evaluateNodes")
+    fun getEdgeTypeCandidates(from: PatternNode, to: PatternNode) = hasRelationConceptEdges.filter {
         it.fromId == from.getConceptId() && it.toId == to.getConceptId()
     }
 
@@ -525,6 +525,7 @@ class IdeographContext(
     }
 
 
+    @Deprecated("use evaluateNodes")
     suspend fun getNodePairsByEdge(edges: List<WorkspaceEdge>): List<WorkspaceNode> {
         val groupedEdges = edges.groupBy { it.relationId }.mapKeys { relationConceptDict[it.key]?.name }
 
