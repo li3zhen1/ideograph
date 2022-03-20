@@ -25,7 +25,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.litote.kmongo:kmongo:4.5.0")
+//    implementation("org.litote.kmongo:kmongo:4.5.0")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.5.0")
     implementation("io.dgraph:dgraph4j:21.12.0")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")

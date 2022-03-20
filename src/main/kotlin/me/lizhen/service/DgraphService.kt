@@ -4,7 +4,7 @@ import io.dgraph.DgraphClient
 import io.dgraph.DgraphGrpc
 import io.dgraph.DgraphProto
 import io.grpc.ManagedChannelBuilder
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import me.lizhen.schema.PatternNode
 import me.lizhen.schema.RelationNode
 
@@ -18,12 +18,14 @@ class DgraphService(
     public val client = DgraphClient(stub)
 
     init {
-        setDgraphSchema()
-        client.newTransaction().query("query{node(func: uid(0x1)){}}")
+        CoroutineScope(Dispatchers.IO).launch {
+            setDgraphSchema()
+            client.newTransaction().query("query{node(func: uid(0x1)){}}")
+        }
     }
 
 
-    private fun setDgraphSchema() {
+    private suspend fun setDgraphSchema() {
         val stringBuilder = StringBuilder()
         stringBuilder.append("<nodeId>: int @index(int) .\n")
         stringBuilder.append("<types>: string @index(hash) .\n")
@@ -31,9 +33,12 @@ class DgraphService(
         mongoService
             .getCollection<RelationNode>("relation_node")
             .find()
-            .forEach {
+            .consumeEach {
                 stringBuilder.append("<${it.name}>: [uid] @reverse .\n")
             }
+//            .forEach {
+//                stringBuilder.append("<${it.name}>: [uid] @reverse .\n")
+//            }
 
         val operation = DgraphProto.Operation.newBuilder()
             .setSchema(stringBuilder.toString())

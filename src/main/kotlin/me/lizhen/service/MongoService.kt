@@ -2,6 +2,9 @@ package me.lizhen.service
 
 import com.mongodb.*
 import org.litote.kmongo.*
+import org.litote.kmongo.reactivestreams.*  //NEEDED! import KMongo reactivestreams extensions
+import org.litote.kmongo.coroutine.*
+
 
 data class DriverNode(
     val name: String,
@@ -16,7 +19,7 @@ class MongoService(
     private val databaseName: String = "relation"
 ) {
     private val settings = createMongoClientSetting(userName, password, hostAddr, port)
-    val client = KMongo.createClient(settings)
+    val client = KMongo.createClient(settings).coroutine
     val database = client.getDatabase(databaseName)
 
     fun test() {

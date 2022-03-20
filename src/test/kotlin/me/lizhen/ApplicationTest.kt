@@ -93,7 +93,7 @@ class ApplicationTest {
 
 
     val p3 = Pattern(
-        nodes = listOf(pnA, pnB, pnC),
+        nodes = listOf(pnC, pnB, pnA),
         edges = listOf(pe, pe2),
         constraints = constraints + listOf(
             PatternConstraint(
@@ -131,18 +131,21 @@ class ApplicationTest {
         sol.forEach {
             println(it.nodes["B"]?.properties)
         }
+        assert(sol.all { it.validate(p1) })
 
 
-//        val sol2 = testPattern(p2)
-//        sol2.forEach {
-//            println(it.nodes["B"]?.properties)
-//        }
-//
-//        val sol3 = testPattern(p3)
-//        sol3.forEach {
-//            println(it.nodes["B"]?.properties)
-//            // TODO: Run distinct
-//        }
+        val sol2 = testPattern(p2)
+        sol2.forEach {
+            println(it.nodes["B"]?.properties)
+        }
+        assert(sol2.all { it.validate(p2) })
+
+        val sol3 = testPattern(p3)
+        sol3.forEach {
+            println(it.nodes["B"]?.properties)
+            // TODO: Run distinct
+        }
+        assert(sol3.all { it.validate(p3) })
 
         // TODO: Lazy?
     }
