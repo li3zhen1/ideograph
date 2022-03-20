@@ -169,6 +169,7 @@ class IdeographContext(
     lateinit var propertyFromDict: Map<Long, List<HasPropertyEdge>>
 
 
+    @Deprecated("Use solvePatternBatched instead.")
     suspend fun solvePattern(pattern: Pattern): List<PatternSolution> {
         val patternNodeDict = pattern.nodes.associateBy { it.patternId }
         val patternEdgeDict = pattern.edges.orEmpty().associateBy { it.patternId }
