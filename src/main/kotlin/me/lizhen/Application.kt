@@ -25,7 +25,6 @@ fun main() {
             get("/schema") {
                 call.respond(context.schema)
             }
-
             post("/solvePattern") {
                 val pattern = call.receive<Pattern>()
                 call.respond(context.solvePattern(pattern))

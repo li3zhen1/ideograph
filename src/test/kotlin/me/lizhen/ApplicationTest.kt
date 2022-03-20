@@ -11,6 +11,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlin.test.*
 import io.ktor.server.testing.*
+import kotlinx.coroutines.runBlocking
 import me.lizhen.plugins.*
 import me.lizhen.schema.*
 import me.lizhen.service.DgraphService
@@ -91,7 +92,6 @@ class ApplicationTest {
         )
     )
 
-
     val p3 = Pattern(
         nodes = listOf(pnC, pnB, pnA),
         edges = listOf(pe, pe2),
@@ -114,7 +114,7 @@ class ApplicationTest {
 
         var solutions: List<PatternSolution>
         val time = measureTime {
-            solutions = ctx.solvePatternBatched(pattern)
+            solutions = runBlocking { ctx.solvePatternBatched(pattern) }
         }
         println("\n\n\n\n$time, ${solutions.size}")
         return solutions

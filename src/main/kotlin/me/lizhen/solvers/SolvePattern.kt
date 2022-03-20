@@ -1,26 +1,28 @@
 package me.lizhen.solvers
 
+import com.mongodb.reactivestreams.client.ClientSession
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
 import me.lizhen.schema.Pattern
 import me.lizhen.schema.PatternConstraint
 import me.lizhen.schema.PatternNode
 import toIndexedPair
 import toInvertedMap
+import javax.swing.text.StyledEditorKit.BoldAction
 import kotlin.time.ExperimentalTime
-//import kotlin.time.TimeSource.Monotonic.markNow
-//import kotlin.time.measureTime
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun IdeographContext.getBestEntry(
-    nodeConstraintPairs: List<Pair<PatternNode, List<PatternConstraint>>>
+    clientSession: ClientSession,
+    nodeConstraintPairs: List<Pair<PatternNode, List<PatternConstraint>>>,
+    requiresAllElementDistinct: Boolean = true
 ): Pair<Int, Long> = runBlocking {
     withContext(Dispatchers.IO) {
         val channels = nodeConstraintPairs.toIndexedPair().map {
             produce {
-                val count = countConstrainedNodes(it.second.first, *it.second.second.toTypedArray())
+                val count = countConstrainedNodes(clientSession, it.second.first, *it.second.second.toTypedArray())
                 send(Pair(it.first, count))
             }
         }
@@ -34,487 +36,270 @@ fun IdeographContext.getBestEntry(
 
 
 @OptIn(ExperimentalTime::class)
-fun IdeographContext.solvePatternBatched(pattern: Pattern): List<PatternSolution> {
-    val patternNodeDict = pattern.nodes.associateBy { it.patternId }
-    val patternNodeIndexDict = pattern.nodes.toInvertedMap { it.patternId }
+suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<PatternSolution> =
+    mongoService.startSession().use { session ->
+        val patternNodeDict = pattern.nodes.associateBy { it.patternId }
+        val patternNodeIndexDict = pattern.nodes.toInvertedMap { it.patternId }
 
-    val patternEdgeDict = pattern.edges.orEmpty().associateBy { it.patternId }
-    val nodeConstraintPairs = pattern.nodes.map {
-        Pair(
-            it, pattern.constraints?.filter { pc -> pc.targetPatternId == it.patternId }.orEmpty()
-        )
-    }
-    val nodeConstraintPair = pattern.nodes.associate {
-        Pair(
-            it.patternId, pattern.constraints?.filter { pc -> pc.targetPatternId == it.patternId }.orEmpty()
-        )
-    }
+        val patternEdgeDict = pattern.edges.orEmpty().associateBy { it.patternId }
+        val nodeConstraintPairs = pattern.nodes.map {
+            Pair(
+                it, pattern.constraints?.filter { pc -> pc.targetPatternId == it.patternId }.orEmpty()
+            )
+        }
+        val nodeConstraintPair = pattern.nodes.associate {
+            Pair(
+                it.patternId, pattern.constraints?.filter { pc -> pc.targetPatternId == it.patternId }.orEmpty()
+            )
+        }
 
-    val entryNodePair = runBlocking {
-        getBestEntry(nodeConstraintPairs)
-    }
+        val entryNodePair = runBlocking {
+            getBestEntry(session, nodeConstraintPairs)
+        }
 
-
-    /**
-     * evaluate 1 pattern node
-     * 1 query
-     */
-/*    fun evaluatePatternNode(
-//        solutionToSolve: PatternSolutionUnderEvaluation,
-//        patternNodeIndex: Int
-//    ): List<PatternSolutionUnderEvaluation> {
-//        val (patternId, evaluated) = solutionToSolve.nodes[patternNodeIndex]
-//        assert(evaluated == null) { "The pattern node already evaluated." }
-//        nodeConstraintPair[patternId]?.let { it ->
-//            val nCandidates = queryNodeWithConstraints(
-//                patternNodeDict[patternId]!!,
-//                *it.toTypedArray()
-//            )
-//            val filledSolutions = nCandidates.map { wn ->
-//                val newNodes = solutionToSolve.nodes.toMutableList()
-//                val index = newNodes.indexOfFirst { n -> n.first == patternId }
-//                newNodes[index] = patternId to wn
-//                solutionToSolve.copy(nodes = newNodes)
-//            }
-//            return filledSolutions
-//        }
-//        throw Error("The node has no constraint. Evaluation Aborted.")}
-*/
-
-
-    /**
-     * evaluate 1 pattern node batched
-     * 1 query
-     * @param solutionsToSolve batched
-     */
-    suspend fun evaluatePatternNode(
         /**
-         * Same evaluation status
+         * evaluate 1 pattern node batched
+         * 1 query
+         * @param solutionsToSolve batched
          */
-        solutionsToSolve: List<PatternSolutionUnderEvaluation>,
-        patternNodeIndex: Int
-    ): List<PatternSolutionUnderEvaluation> {
-        val batchedNodes = solutionsToSolve.map { it.nodes[patternNodeIndex] }
-        val patternId = batchedNodes[0].first
-        assert(batchedNodes.all { it.second == null }) { "The pattern node already evaluated." }
+        suspend fun evaluatePatternNode(
+            /**
+             * Same evaluation status
+             */
+            solutionsToSolve: List<PatternSolutionUnderEvaluation>,
+            patternNodeIndex: Int
+        ): List<PatternSolutionUnderEvaluation> {
+            val batchedNodes = solutionsToSolve.map { it.nodes[patternNodeIndex] }
+            val patternId = batchedNodes[0].first
+            assert(batchedNodes.all { it.second == null }) { "The pattern node already evaluated." }
 
-        val nodeCandidate = patternNodeDict[patternId]?.let {
-            queryNodeWithConstraints(it, *nodeConstraintPair[patternId].orEmpty().toTypedArray())
-        }
-        if (nodeCandidate.isNullOrEmpty()) return emptyList()
-        return solutionsToSolve.flatMap {
-            nodeCandidate.map { wn ->
-                val newNodes = it.nodes.toMutableList()
-                val index = newNodes.indexOfFirst { n -> n.first == patternId }
-                newNodes[index] = patternId to wn
-                it.copy(nodes = newNodes)
+            val nodeCandidate = patternNodeDict[patternId]?.let {
+                queryNodeWithConstraints(session, it, *nodeConstraintPair[patternId].orEmpty().toTypedArray()).toList()
             }
-        }
-    }
-
-
-/*    fun evaluatePatternEdge(
-        solutionToSolve: PatternSolutionUnderEvaluation,
-        patternEdgeIndex: Int,
-    ): List<PatternSolutionUnderEvaluation>? {
-        val (patternId, evaluated) = solutionToSolve.edges.getOrNull(patternEdgeIndex) ?: return null
-        assert(evaluated == null) { "The pattern edge already evaluated." }
-        val patternEdge = patternEdgeDict[patternId]!!
-        val (fromIndex, toIndex) = solutionToSolve.getNodeIndices(patternEdge)
-        val fromSol = solutionToSolve.nodes[fromIndex]
-        val toSol = solutionToSolve.nodes[toIndex]
-        when {
-            fromSol.second != null && toSol.second != null -> {
-                // 1 query
-                val eCandidates = queryEdges(
-                    patternEdge.type,
-                    nodeFrom = listOf(fromSol.second!!),
-                    nodeTo = listOf(toSol.second!!)
-                )
-                return if (eCandidates.isEmpty()) emptyList() // dead
-                else eCandidates.map {
-                    solutionToSolve.copy(edges = solutionToSolve.getUpdatedEdges(patternEdge, it))
+//        if (nodeCandidate.isNullOrEmpty()) return emptyList()
+            return solutionsToSolve.flatMap {
+                nodeCandidate.orEmpty().map { wn ->
+                    val newNodes = it.nodes.toMutableList()
+                    val index = newNodes.indexOfFirst { n -> n.first == patternId }
+                    newNodes[index] = patternId to wn
+                    it.copy(nodes = newNodes)
                 }
             }
-            fromSol.second != null -> {
-                // 2 query
-                val eCandidates = queryEdges(patternEdge.type, nodeFrom = listOf(fromSol.second!!))
-                if (eCandidates.isEmpty()) return emptyList()
-                else {
-                    val toPattern = patternNodeDict[patternEdge.toPatternId]!!
-                    val toTypeName = toPattern.type
-                    val toCandidates = queryNodeWithConstraints(
-                        toTypeName,
-                        eCandidates.map { e -> e.toId }
-                    )
-                    val filteredToCandidates = toCandidates.filter {
-                        nodeConstraintPair[toPattern.patternId].validate(it)
-                    }
-                    return filteredToCandidates.map {
-                        val correspondingEdge = eCandidates.first { e -> e.toId == it.nodeId }
-                        return@map solutionToSolve.copy(
-                            nodes = solutionToSolve.getUpdatedNodes(toPattern, it),
-                            edges = solutionToSolve.getUpdatedEdges(patternEdge, correspondingEdge)
-                        )
+        }
+
+        suspend fun evaluatePatternEdge(
+            solutionsToSolve: List<PatternSolutionUnderEvaluation>,
+            patternEdgeIndex: Int,
+            onComplete: (newlyEvaluatedNodeIndices: List<Int>) -> Unit
+        ): List<PatternSolutionUnderEvaluation> {
+            val batchedEdges = solutionsToSolve.map { it.edges[patternEdgeIndex] }
+            assert(batchedEdges.all { it.second == null }) { "The pattern edge already evaluated." }
+            val patternId = batchedEdges[0].first
+            val patternEdge = patternEdgeDict[patternId]!!
+
+            val (fromIndex, toIndex) = solutionsToSolve[0].getNodeIndices(patternEdge)
+
+            val (_, _fromSolutions) = solutionsToSolve.map { it.nodes[fromIndex] }.unzip()
+            val (_, _toSolutions) = solutionsToSolve.map { it.nodes[toIndex] }.unzip()
+
+            val fromSolutions = _fromSolutions.distinctBy { it?.nodeId }
+            val toSolutions = _toSolutions.distinctBy { it?.nodeId }
+
+            val fromNodesFilled = fromSolutions[0] != null
+            val toNodesFilled = toSolutions[0] != null
+
+            when {
+                fromNodesFilled && toNodesFilled -> {
+                    // 1 query, TODO: Ranges can be narrowed
+                    val eCandidates = queryEdges(
+                        session,
+                        patternEdge.type,
+                        nodeFrom = fromSolutions.requireNoNulls(),
+                        nodeTo = toSolutions.requireNoNulls()
+                    ).toList()
+                    return (
+                            if (eCandidates.isEmpty()) emptyList() // dead
+                            else solutionsToSolve.flatMap { solutionToSolve ->
+                                eCandidates.map {
+                                    solutionToSolve.copy(edges = solutionToSolve.getUpdatedEdges(patternEdge, it))
+                                }
+                            })
+                        .also { onComplete(emptyList()) }
+                }
+                fromNodesFilled -> {
+                    // 2 query
+                    val eCandidates = queryEdges(
+                        session,
+                        patternEdge.type, nodeFrom = fromSolutions.requireNoNulls()
+                    ).toList()
+                    if (eCandidates.isEmpty()) return emptyList()
+                    else {
+                        val toPattern = patternNodeDict[patternEdge.toPatternId]!!
+
+                        val toTypeName = toPattern.type
+                        val toCandidates = queryNodeWithConstraints(
+                            session,
+                            toTypeName,
+                            eCandidates.map { e -> e.toId }
+                        ).toList()
+                        val filteredToCandidates = toCandidates.filter {
+                            nodeConstraintPair[toPattern.patternId].validate(it)
+                        }
+
+                        val fromNodeIndex = patternNodeIndexDict[patternEdge.fromPatternId]!!
+
+                        val eCandidateDictByTo = eCandidates.associateBy { it.toId }
+
+                        val solutionDict = solutionsToSolve.groupBy {
+                            it.nodes[fromNodeIndex].second!!.nodeId
+                        }
+
+
+                        // match candidate to solution needed!!
+                        return filteredToCandidates.flatMap { wn ->
+                            val correspondingEdge =
+                                eCandidateDictByTo[wn.nodeId]!!//eCandidates.firstOrNull { e -> e.toId == wn.nodeId }!!
+                            val solutionsToFill = solutionDict[correspondingEdge.fromId]
+                            return@flatMap solutionsToFill?.map {
+                                PatternSolutionUnderEvaluation(
+                                    nodes = it.getUpdatedNodes(toPattern, wn),
+                                    edges = it.getUpdatedEdges(patternEdge, correspondingEdge)
+                                )
+                            }.orEmpty()
+                        }.also { onComplete(listOf(toIndex)) }
+
                     }
                 }
-            }
-            toSol.second != null -> {
-                // 2 query
-                val eCandidates = queryEdges(patternEdge.type, nodeTo = listOf(toSol.second!!))
-                if (eCandidates.isEmpty()) return emptyList()
-                else {
+                toNodesFilled -> {
+                    // 2 query
+                    val eCandidates =
+                        queryEdges(session, patternEdge.type, nodeTo = toSolutions.requireNoNulls()).toList()
+                    if (eCandidates.isEmpty()) return emptyList()
+                    else {
+                        val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
+                        val fromTypeName = fromPattern.type
+                        val fromCandidates = queryNodeWithConstraints(
+                            session,
+                            fromTypeName,
+                            eCandidates.map { e -> e.fromId }
+                        ).toList()
+                        val filteredFromCandidates = fromCandidates.filter {
+                            nodeConstraintPair[fromPattern.patternId].validate(it)
+                        }
+                        val toNodeIndex = patternNodeIndexDict[patternEdge.toPatternId]!!
+                        val solutionDict = solutionsToSolve.groupBy {
+                            it.nodes[toNodeIndex].second!!.nodeId
+                        }
+                        val eCandidateDictByFrom = eCandidates.associateBy { it.fromId }
+
+                        return filteredFromCandidates.flatMap { wn ->
+                            val correspondingEdge =
+                                eCandidateDictByFrom[wn.nodeId]!!//eCandidates.firstOrNull { e -> e.toId == wn.nodeId }!!
+                            val solutionsToFill = solutionDict[correspondingEdge.toId]
+                            return@flatMap solutionsToFill?.map {
+                                PatternSolutionUnderEvaluation(
+                                    nodes = it.getUpdatedNodes(fromPattern, wn),
+                                    edges = it.getUpdatedEdges(patternEdge, correspondingEdge)
+                                )
+                            }.orEmpty()
+                        }.also { onComplete(listOf(fromIndex)) }
+                    }
+                }
+                else -> {
+                    // 2-3 query
                     val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
-                    val fromTypeName = fromPattern.type
-                    val fromCandidates = queryNodeWithConstraints(
-                        fromTypeName,
-                        eCandidates.map { e -> e.fromId }
-                    )
-                    val filteredFromCandidates = fromCandidates.filter {
-                        nodeConstraintPair[fromPattern.patternId].validate(it)
-                    }
-                    return filteredFromCandidates.map {
-                        val correspondingEdge = eCandidates.first { e -> e.fromId == it.nodeId }
-                        return@map solutionToSolve.copy(
-                            nodes = solutionToSolve.getUpdatedNodes(fromPattern, it),
-                            edges = solutionToSolve.getUpdatedEdges(patternEdge, correspondingEdge)
-                        )
-                    }
-                }
-            }
-            else -> {
-                // 2-3 query
-                val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
-                val toPattern = patternNodeDict[patternEdge.toPatternId]!!
-                val workspaceEdges = queryEdges(patternEdge.type)
-                val fromNodeIds = workspaceEdges.map { it.fromId }
-                val toNodeIds = workspaceEdges.map { it.toId }
+                    val toPattern = patternNodeDict[patternEdge.toPatternId]!!
+                    val workspaceEdges = queryEdges(session, patternEdge.type).toList()
+                    val fromNodeIds = workspaceEdges.map { it.fromId }
+                    val toNodeIds = workspaceEdges.map { it.toId }
 //                val fromNodes = queryNodeWithConstraints(fromPattern.type, fromNodeIds).associateBy { it.nodeId }
 //                val toNodes = queryNodeWithConstraints(toPattern.type, toNodeIds).associateBy { it.nodeId }
-                val nodePool = if (fromPattern.type == toPattern.type) {
-                    queryNodeWithConstraints(fromPattern.type, fromNodeIds + toNodeIds)
-                } else {
-                    (queryNodeWithConstraints(fromPattern.type, fromNodeIds) + queryNodeWithConstraints(
-                        toPattern.type,
-                        toNodeIds
-                    ))
-                }.associateBy { it.nodeId }
-                return workspaceEdges.map {
-                    solutionToSolve.copy(
-                        nodes = solutionToSolve.getUpdatedNodes(
-                            listOf(
-                                fromPattern.patternId to nodePool[it.fromId],
-                                toPattern.patternId to nodePool[it.toId]
-                            ),
-                        ),
-                        edges = solutionToSolve.getUpdatedEdges(patternEdge, it)
-                    )
-                }
-            }
-        }
-    }*/
-
-    suspend fun evaluatePatternEdge(
-        solutionsToSolve: List<PatternSolutionUnderEvaluation>,
-        patternEdgeIndex: Int,
-        onComplete: (newlyEvaluatedNodeIndices: List<Int>) -> Unit
-    ): List<PatternSolutionUnderEvaluation> {
-        val batchedEdges = solutionsToSolve.map { it.edges[patternEdgeIndex] }
-        assert(batchedEdges.all { it.second == null }) { "The pattern edge already evaluated." }
-        val patternId = batchedEdges[0].first
-        val patternEdge = patternEdgeDict[patternId]!!
-
-        val (fromIndex, toIndex) = solutionsToSolve[0].getNodeIndices(patternEdge)
-
-        val (fromPatternIds, _fromSolutions) = solutionsToSolve.map { it.nodes[fromIndex] }.unzip()
-        val (toPatternIds, _toSolutions) = solutionsToSolve.map { it.nodes[toIndex] }.unzip()
-
-        val fromSolutions = _fromSolutions.distinctBy { it?.nodeId }
-        val toSolutions = _toSolutions.distinctBy { it?.nodeId }
-
-        val fromNodesFilled = fromSolutions[0] != null
-        val toNodesFilled = toSolutions[0] != null
-
-        when {
-            fromNodesFilled && toNodesFilled -> {
-                // 1 query, TODO: Ranges can be narrowed
-                val eCandidates = queryEdges(
-                    patternEdge.type,
-                    nodeFrom = fromSolutions.requireNoNulls(),
-                    nodeTo = toSolutions.requireNoNulls()
-                )
-                return (
-                        if (eCandidates.isEmpty()) emptyList() // dead
-                        else solutionsToSolve.flatMap { solutionToSolve ->
-                            eCandidates.map {
-                                solutionToSolve.copy(edges = solutionToSolve.getUpdatedEdges(patternEdge, it))
-                            }
-                        })
-                    .also { onComplete(emptyList()) }
-            }
-            fromNodesFilled -> {
-                // 2 query
-                val eCandidates = queryEdges(patternEdge.type, nodeFrom = fromSolutions.requireNoNulls())
-                if (eCandidates.isEmpty()) return emptyList()
-                else {
-                    val toPattern = patternNodeDict[patternEdge.toPatternId]!!
-
-//                    val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
-
-                    val toTypeName = toPattern.type
-                    val toCandidates = queryNodeWithConstraints(
-                        toTypeName,
-                        eCandidates.map { e -> e.toId }
-                    )
-                    val filteredToCandidates = toCandidates.filter {
-                        nodeConstraintPair[toPattern.patternId].validate(it)
-                    }
-
-                    val fromNodeIndex = patternNodeIndexDict[patternEdge.fromPatternId]!!
-
-                    val eCandidateDictByTo = eCandidates.associateBy { it.toId }
-
-                    val solutionDict = solutionsToSolve.groupBy {
-                        it.nodes[fromNodeIndex].second!!.nodeId
-                    }
-
-
-                    // match candidate to solution needed!!
-                    return filteredToCandidates.flatMap { wn ->
-                        val correspondingEdge =
-                            eCandidateDictByTo[wn.nodeId]!!//eCandidates.firstOrNull { e -> e.toId == wn.nodeId }!!
-                        val solutionsToFill = solutionDict[correspondingEdge.fromId]
-                        return@flatMap solutionsToFill?.map {
-                            PatternSolutionUnderEvaluation(
-                                nodes = it.getUpdatedNodes(toPattern, wn),
-                                edges = it.getUpdatedEdges(patternEdge, correspondingEdge)
-                            )
-                        }.orEmpty()
-                    }.also { onComplete(listOf(toIndex)) }
-
-                }
-            }
-            toNodesFilled -> {
-                // 2 query
-                val eCandidates = queryEdges(patternEdge.type, nodeTo = toSolutions.requireNoNulls())
-                if (eCandidates.isEmpty()) return emptyList()
-                else {
-                    val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
-                    val fromTypeName = fromPattern.type
-                    val fromCandidates = queryNodeWithConstraints(
-                        fromTypeName,
-                        eCandidates.map { e -> e.fromId }
-                    )
-                    val filteredFromCandidates = fromCandidates.filter {
-                        nodeConstraintPair[fromPattern.patternId].validate(it)
-                    }
-                    val toNodeIndex = patternNodeIndexDict[patternEdge.toPatternId]!!
-                    val solutionDict = solutionsToSolve.groupBy {
-                        it.nodes[toNodeIndex].second!!.nodeId
-                    }
-                    val eCandidateDictByFrom = eCandidates.associateBy { it.fromId }
-
-                    return filteredFromCandidates.flatMap { wn ->
-                        val correspondingEdge =
-                            eCandidateDictByFrom[wn.nodeId]!!//eCandidates.firstOrNull { e -> e.toId == wn.nodeId }!!
-                        val solutionsToFill = solutionDict[correspondingEdge.toId]
-                        return@flatMap solutionsToFill?.map {
-                            PatternSolutionUnderEvaluation(
-                                nodes = it.getUpdatedNodes(fromPattern, wn),
-                                edges = it.getUpdatedEdges(patternEdge, correspondingEdge)
-                            )
-                        }.orEmpty()
-                    }.also { onComplete(listOf(fromIndex)) }
-                }
-            }
-            else -> {
-                // 2-3 query
-                val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
-                val toPattern = patternNodeDict[patternEdge.toPatternId]!!
-                val workspaceEdges = queryEdges(patternEdge.type)
-                val fromNodeIds = workspaceEdges.map { it.fromId }
-                val toNodeIds = workspaceEdges.map { it.toId }
-//                val fromNodes = queryNodeWithConstraints(fromPattern.type, fromNodeIds).associateBy { it.nodeId }
-//                val toNodes = queryNodeWithConstraints(toPattern.type, toNodeIds).associateBy { it.nodeId }
-                val nodePool = if (fromPattern.type == toPattern.type) {
-                    queryNodeWithConstraints(fromPattern.type, fromNodeIds + toNodeIds)
-                } else {
-                    (queryNodeWithConstraints(fromPattern.type, fromNodeIds) + queryNodeWithConstraints(
-                        toPattern.type,
-                        toNodeIds
-                    ))
-                }.associateBy { it.nodeId }
-
-                return solutionsToSolve.flatMap { solutionToSolve ->
-                    workspaceEdges.map {
-                        solutionToSolve.copy(
-                            nodes = solutionToSolve.getUpdatedNodes(
-                                listOf(
-                                    fromPattern.patternId to nodePool[it.fromId],
-                                    toPattern.patternId to nodePool[it.toId]
+                    val nodePool = if (fromPattern.type == toPattern.type) {
+                        queryNodeWithConstraints(session, fromPattern.type, fromNodeIds + toNodeIds).toList()
+                    } else {
+                        // TODO: Parallel?
+                        queryNodeWithConstraints(session, fromPattern.type, fromNodeIds).toList() +
+                                queryNodeWithConstraints(session, toPattern.type, toNodeIds).toList()
+                    }.associateBy { it.nodeId }
+                    return solutionsToSolve.flatMap { solutionToSolve ->
+                        workspaceEdges.map {
+                            solutionToSolve.copy(
+                                nodes = solutionToSolve.getUpdatedNodes(
+                                    listOf(
+                                        fromPattern.patternId to nodePool[it.fromId],
+                                        toPattern.patternId to nodePool[it.toId]
+                                    ),
                                 ),
-                            ),
-                            edges = solutionToSolve.getUpdatedEdges(patternEdge, it)
-                        )
-                    }
-                }.also { onComplete(listOf(fromIndex, toIndex)) }
+                                edges = solutionToSolve.getUpdatedEdges(patternEdge, it)
+                            )
+                        }
+                    }.also { onComplete(listOf(fromIndex, toIndex)) }
+                }
             }
         }
-    }
 
-    val emptySolution = PatternSolutionUnderEvaluation(
-        nodes = pattern.nodes.map { it.patternId to null },
-        edges = pattern.edges.orEmpty().map { it.patternId to null }
-    )
-
-    var solutionPool = listOf(emptySolution)
-    val firstPatternNodeId = nodeConstraintPairs[entryNodePair.first].first.patternId
-
-
-    val edgePointIndices = pattern.edges.orEmpty().map { it -> emptySolution.getNodeIndices(it) }
-    val nodeAsFromIndices = pattern.nodes.map { emptyList<Int>().toMutableList() }
-    val nodeAsToIndices = pattern.nodes.map { emptyList<Int>().toMutableList() }
-    pattern.edges?.forEachIndexed { index, e ->
-        nodeAsFromIndices[edgePointIndices[index].first] += index
-        nodeAsToIndices[edgePointIndices[index].second] += index
-    }
-    val edgeEvaluatedFlags = pattern.edges.orEmpty().map { false }.toMutableList()
-    val nodeEvaluatedFlags = pattern.nodes.map { false }.toMutableList()
-
-    var evaluatedNodeIndices = listOf(patternNodeIndexDict[firstPatternNodeId]!!)
-    nodeEvaluatedFlags[evaluatedNodeIndices[0]] = true
-
-    solutionPool = runBlocking {
-        evaluatePatternNode(
-            solutionPool,
-            evaluatedNodeIndices[0]
+        val emptySolution = PatternSolutionUnderEvaluation(
+            nodes = pattern.nodes.map { it.patternId to null },
+            edges = pattern.edges.orEmpty().map { it.patternId to null }
         )
-    }
 
-    while (true) {
-        if (solutionPool.isEmpty() || solutionPool[0].isValid) break // all solutions are evaluated
+        var solutionPool = listOf(emptySolution)
+        val firstPatternNodeId = nodeConstraintPairs[entryNodePair.first].first.patternId
 
-        val edgeToEvaluate = evaluatedNodeIndices.flatMap { nodeAsFromIndices[it] }.firstOrNull { edgeIndex ->
-            !edgeEvaluatedFlags[edgeIndex]
-        } ?: evaluatedNodeIndices.flatMap { nodeAsFromIndices[it] }.firstOrNull { edgeIndex ->
-            !edgeEvaluatedFlags[edgeIndex]
-        } ?: edgeEvaluatedFlags.indexOfFirst { !it }
+
+        val edgePointIndices = pattern.edges.orEmpty().map { it -> emptySolution.getNodeIndices(it) }
+        val nodeAsFromIndices = pattern.nodes.map { emptyList<Int>().toMutableList() }
+        val nodeAsToIndices = pattern.nodes.map { emptyList<Int>().toMutableList() }
+        pattern.edges?.forEachIndexed { index, e ->
+            nodeAsFromIndices[edgePointIndices[index].first] += index
+            nodeAsToIndices[edgePointIndices[index].second] += index
+        }
+        val edgeEvaluatedFlags = pattern.edges.orEmpty().map { false }.toMutableList()
+        val nodeEvaluatedFlags = pattern.nodes.map { false }.toMutableList()
+
+        var evaluatedNodeIndices = listOf(patternNodeIndexDict[firstPatternNodeId]!!)
+        nodeEvaluatedFlags[evaluatedNodeIndices[0]] = true
 
         solutionPool = runBlocking {
-            evaluatePatternEdge(
+            evaluatePatternNode(
                 solutionPool,
-                edgeToEvaluate
-            ) {
-                edgeEvaluatedFlags[edgeToEvaluate] = true
-                it.forEach { nid -> nodeEvaluatedFlags[nid] = true }
-                evaluatedNodeIndices = it
-            }
+                evaluatedNodeIndices[0]
+            )
         }
+
+        while (true) {
+            if (solutionPool.isEmpty() || solutionPool[0].isValid) break // all solutions are evaluated
+
+            val edgeToEvaluate = evaluatedNodeIndices
+                    .flatMap { nodeAsFromIndices[it] }
+                    .firstOrNull { edgeIndex ->
+                        !edgeEvaluatedFlags[edgeIndex]
+                    }
+
+                    ?: evaluatedNodeIndices
+                        .flatMap { nodeAsFromIndices[it] }
+                        .firstOrNull { edgeIndex ->
+                            !edgeEvaluatedFlags[edgeIndex]
+                        }
+
+                    ?: edgeEvaluatedFlags
+                        .indexOfFirst { !it }
+
+            solutionPool = runBlocking {
+                evaluatePatternEdge(
+                    solutionPool,
+                    edgeToEvaluate
+                ) {
+                    edgeEvaluatedFlags[edgeToEvaluate] = true
+                    it.forEach { nid -> nodeEvaluatedFlags[nid] = true }
+                    evaluatedNodeIndices = it
+                }
+            }.filter { it.isAllEvaluatedDistinct }
+        }
+
+        return solutionPool.mapNotNull { it.completed() }.also { session.close() }
     }
 
-//    while (true) {
-//        if (solutionPool.isEmpty()) break
-//        val solutionToSolve = solutionPool.removeAt(0)
-//        if (solutionToSolve.isValid) // all solutions are evaluated
-//            break
-//
-//        // find target to evaluate
-//
-//        val patternNodeToEvaluate = solutionToSolve.nodes.firstOrNull {
-//            it.second == null && patternNodeCandidateCounts[it.first]!! < IdeographContext.EVALUABLE_CANDIDATE_LIMIT
-//        }
-//
-//        if (patternNodeToEvaluate != null) {
-//            nodeConstraintPair[patternNodeToEvaluate.first]?.let {
-//                val nCandidates = queryNodeWithConstraints(
-//                    patternNodeDict[patternNodeToEvaluate.first]!!,
-//                    *it.toTypedArray()
-//                )
-//                val filledSolutions = nCandidates.map { wn ->
-//                    val newNodes = solutionToSolve.nodes.toMutableList()
-//                    val index = newNodes.indexOfFirst { n -> n.first == patternNodeToEvaluate.first }
-//                    newNodes[index] = patternNodeToEvaluate.first to wn
-//                    solutionToSolve.copy(nodes = newNodes)
-//                }
-//                solutionPool += filledSolutions
-//            }
-//        } else {
-//            solutionToSolve.edges.firstOrNull { (patternId, candidate) ->
-//                val patternEdge = patternEdgeDict[patternId]!!
-//                if (candidate != null) return@firstOrNull false
-//                val (fromIndex, toIndex) = solutionToSolve.getNodeIndices(patternEdge)
-//                val fromSol = solutionToSolve.nodes[fromIndex]
-//                val toSol = solutionToSolve.nodes[toIndex]
-//
-//                if ((fromSol.second != null) && (toSol.second == null)) {
-//                    val eCandidates = queryEdges(patternEdge.type, nodeFrom = listOf(fromSol.second!!))
-//                    if (eCandidates.isEmpty()) return@firstOrNull false
-//                    else {
-//                        val toPattern = patternNodeDict[patternEdge.toPatternId]!!
-//                        val toTypeName = toPattern.type
-//                        val toCandidates = queryNodeWithConstraints(
-//                            toTypeName,
-//                            eCandidates.map { e -> e.toId }
-//                        )
-//                        val filteredToCandidates = toCandidates.filter {
-//                            nodeConstraintPair[toPattern.patternId].validate(it)
-//                        }
-//                        val filledSolutions = filteredToCandidates.map {
-//                            val correspondingEdge = eCandidates.firstOrNull { e -> e.toId == it.nodeId }!!
-//                            return@map solutionToSolve.copy(
-//                                nodes = solutionToSolve.getUpdatedNodes(toPattern, it),
-//                                edges = solutionToSolve.getUpdatedEdges(patternEdge, correspondingEdge)
-//                            )
-//                        }
-//                        solutionPool += filledSolutions
-//                        return@firstOrNull true
-//                    }
-//                } else if ((fromSol.second == null) && (toSol.second != null)) {
-//                    val eCandidates = queryEdges(patternEdge.type, nodeTo = listOf(toSol.second!!))
-//                    if (eCandidates.isEmpty()) return@firstOrNull false
-//                    else {
-//                        val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
-//                        val fromTypeName = fromPattern.type
-//                        val fromCandidates = queryNodeWithConstraints(
-//                            fromTypeName,
-//                            eCandidates.map { e -> e.fromId }
-//                        )
-//                        val filteredFromCandidates = fromCandidates.filter {
-//                            nodeConstraintPair[fromPattern.patternId].validate(it)
-//                        }
-//                        val filledSolutions = filteredFromCandidates.map {
-//                            val correspondingEdge = eCandidates.firstOrNull { e -> e.fromId == it.nodeId }!!
-//                            return@map solutionToSolve.copy(
-//                                nodes = solutionToSolve.getUpdatedNodes(fromPattern, it),
-//                                edges = solutionToSolve.getUpdatedEdges(patternEdge, correspondingEdge)
-//                            )
-//                        }
-//                        solutionPool += filledSolutions
-//                        return@firstOrNull true
-//                    }
-//                } else if (fromSol.second != null) {
-//                    val eCandidates = queryEdges(
-//                        patternEdge.type,
-//                        nodeFrom = listOf(fromSol.second!!),
-//                        nodeTo = listOf(toSol.second!!)
-//                    )
-//                    if (eCandidates.isEmpty()) return@firstOrNull false
-//                    else {
-//                        val filledSolutions = eCandidates.map { ec ->
-//                            return@map solutionToSolve.copy(
-//                                edges = solutionToSolve.getUpdatedEdges(patternEdge, ec)
-//                            )
-//                        }
-//                        solutionPool += filledSolutions
-//                        return@firstOrNull true
-//                    }
-//                } else return@firstOrNull false
-//            }
-//        }
-//    }
-
-    return solutionPool.mapNotNull { it.completed() }
-}
 //        patternNodeQueues.forEach { entry ->
 //            val patternNode = patternNodeDict[entry.key]
 //            val targetingConstraints = nodeConstraintPair[entry.key]

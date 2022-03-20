@@ -1,11 +1,12 @@
 package me.lizhen.solvers
 
+import com.mongodb.reactivestreams.client.ClientSession
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import me.lizhen.schema.*
-import me.lizhen.service.DgraphService
-import me.lizhen.service.MongoService
+import me.lizhen.service.*
 import org.litote.kmongo.*
+import org.litote.kmongo.coroutine.*
 
 
 @Serializable
@@ -49,8 +50,10 @@ data class PatternSolutionUnderEvaluation(
     val edges: List<Pair<String, WorkspaceEdge?>>,
 ) {
     inline val isValid get() = nodes.all { it.second != null } && edges.all { it.second != null }
+    inline val isAllEvaluatedDistinct get() = nodes.mapNotNull { it.second }.run { distinct().size == size }
+            && edges.mapNotNull { it.second }.run { distinct().size == size }
 
-//    inline fun getNode(patternNode: PatternNode) = nodes.firstOrNull { n -> n.first == patternNode.patternId }
+    //    inline fun getNode(patternNode: PatternNode) = nodes.firstOrNull { n -> n.first == patternNode.patternId }
     inline fun getEdge(patternEdge: PatternEdge) = nodes.firstOrNull { n -> n.first == patternEdge.patternId }
     inline fun getEdgeNodeTriple(patternEdge: PatternEdge):
             Triple<Pair<String, WorkspaceNode?>?, Pair<String, WorkspaceNode?>?, Pair<String, WorkspaceNode?>?> {
@@ -126,19 +129,6 @@ data class PatternSolutionUnderEvaluation(
             )
         return null
     }
-
-//    inline fun selectEdgeToEvaluateByHotNode(hotNodeIndex: Int): Int {
-//        val (fromIndex, toIndex) = getNodeIndices(edges[hotEdgeIndex])
-//    }
-
-//    inline fun selectEdgeToEvaluateByHotEdge(hotEdgeIndex: Int): Int {
-//
-//    }
-//
-//    inline fun selectEdgeToEvaluate(): Int {
-//
-//    }
-
 
     companion object {
 //        const val EDGE_EVALUATED = -1
@@ -382,19 +372,6 @@ class IdeographContext(
 //        return solutions
     }
 
-
-//    private fun queryIfNodePairsConnected(
-//        nodePairs: List<Pair<WorkspaceNode, WorkspaceNode>>,
-//        edgeTypeName: String
-//    ): List<WorkspaceEdge?> {
-//        if (nodePairs.)
-//            return mongoService
-//                .getCollection<WorkspaceNode>(edgeTypeName + "_edge")
-//                .find(
-//
-//                )
-//    }
-
     suspend fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
         return mongoService
             .getCollection<WorkspaceNode>(node.type + "_node")
@@ -406,6 +383,21 @@ class IdeographContext(
                 )
             )
     }
+
+    suspend fun countConstrainedNodes(
+        session: ClientSession,
+        node: PatternNode,
+        vararg constraints: PatternConstraint
+    ): Long = mongoService
+        .getCollection<WorkspaceNode>(node.type + "_node")
+        .countDocuments(
+            clientSession = session,
+            filter = and(
+                constraints.map {
+                    WorkspaceNode::properties.keyProjection(it.property) regex it.value
+                }
+            )
+        )
 
 //        return mongoService
 //            .getCollection<WorkspaceNode>(node.type + "_node")
@@ -438,6 +430,22 @@ class IdeographContext(
         return find.toList()
     }
 
+
+    suspend fun queryNodeWithConstraints(
+        session: ClientSession,
+        node: PatternNode,
+        vararg constraints: PatternConstraint
+    ) = mongoService
+        .getCollection<WorkspaceNode>(node.type + "_node")
+        .find(
+            session,
+            and(
+                constraints.map {
+                    WorkspaceNode::properties.keyProjection(it.property) regex it.value
+                }
+            )
+        )
+
     suspend fun queryNodeWithConstraints(
         nodeTypeName: String,
         nodeIds: List<Long>,
@@ -457,6 +465,23 @@ class IdeographContext(
         return find.toList()
     }
 
+    suspend fun queryNodeWithConstraints(
+        clientSession: ClientSession,
+        nodeTypeName: String,
+        nodeIds: List<Long>,
+        vararg constraints: PatternConstraint
+    ) = mongoService
+        .getCollection<WorkspaceNode>(nodeTypeName + "_node")
+        .find(
+            clientSession,
+            and(WorkspaceNode::nodeId `in` nodeIds,
+                and(
+                    constraints.map {
+                        WorkspaceNode::properties.keyProjection(it.property) regex it.value
+                    }
+                ))
+        )
+
 
     suspend fun queryEdges(
         edgeTypeName: String,
@@ -468,6 +493,18 @@ class IdeographContext(
         nodeTo?.map { it.nodeId }
     )
 
+
+    fun queryEdges(
+        clientSession: ClientSession,
+        edgeTypeName: String,
+        nodeFrom: List<WorkspaceNode>? = null,
+        nodeTo: List<WorkspaceNode>? = null
+    ): CoroutineFindPublisher<WorkspaceEdge> = queryEdgesByNodeId(
+        clientSession,
+        edgeTypeName,
+        nodeFrom?.map { it.nodeId },
+        nodeTo?.map { it.nodeId }
+    )
 
     private suspend fun queryEdgesByNodeId(
         edgeTypeName: String,
@@ -495,6 +532,35 @@ class IdeographContext(
             .getCollection<WorkspaceEdge>(edgeTypeName + "_edge")
             .find(and(filters))
             .toList()
+    }
+
+
+    private fun queryEdgesByNodeId(
+        clientSession: ClientSession,
+        edgeTypeName: String,
+        nodeFrom: List<Long>? = null,
+        nodeTo: List<Long>? = null
+    ): CoroutineFindPublisher<WorkspaceEdge> {
+
+        val fromIds = nodeFrom?.run {
+            if (nodeFrom.size == 1)
+                WorkspaceEdge::fromId eq nodeFrom[0]
+            else
+                WorkspaceEdge::fromId `in` this
+        }
+        val toIds = nodeTo?.run {
+            if (nodeTo.size == 1)
+                WorkspaceEdge::toId eq nodeTo[0]
+            else
+                WorkspaceEdge::toId `in` this
+        }
+
+        val filters = listOfNotNull(fromIds, toIds)
+
+        return mongoService
+            .database
+            .getCollection<WorkspaceEdge>(edgeTypeName + "_edge")
+            .find(clientSession, and(filters))
     }
 
     @Deprecated("use evaluateNodes")

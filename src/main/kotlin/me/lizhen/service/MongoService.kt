@@ -16,7 +16,10 @@ class MongoService(
     public val database = client.getDatabase(databaseName)
 
 
-    inline fun <reified T : Any>getCollection(name: String) = database.getCollection<T>(name)
+    inline fun <reified T : Any> getCollection(name: String) = database.getCollection<T>(name)
+    suspend inline fun startSession(options: ClientSessionOptions? = null) = if (options == null)
+        client.startSession()
+    else client.startSession(options)
 
     companion object {
         private fun createMongoClientSetting(

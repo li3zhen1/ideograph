@@ -95,7 +95,13 @@ data class WorkspaceNode(
     val tags: String?,
     val judgeParent: Boolean,
     val properties: Map<String, String>,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if(other is WorkspaceNode)
+            return nodeId == other.nodeId
+        return false
+    }
+}
 
 
 @Serializable
@@ -120,4 +126,12 @@ data class WorkspaceEdge(
 //    val trustedSafety: Long,
 //    val trustedTimeliness: Long,
 //    val trustedValue: Long
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if(other is WorkspaceEdge)
+            return (edgeId == other.edgeId
+//                    && fromId == other.edgeId && toId == other.edgeId
+                    )
+        return false
+    }
+}
