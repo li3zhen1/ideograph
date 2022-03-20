@@ -36,9 +36,6 @@ class DgraphService(
             .consumeEach {
                 stringBuilder.append("<${it.name}>: [uid] @reverse .\n")
             }
-//            .forEach {
-//                stringBuilder.append("<${it.name}>: [uid] @reverse .\n")
-//            }
 
         val operation = DgraphProto.Operation.newBuilder()
             .setSchema(stringBuilder.toString())

@@ -165,8 +165,6 @@ class IdeographContext(
     public val mongoService: MongoService,
     public val dgraphService: DgraphService
 ) {
-
-
     init {
         initializeSchema()
     }
@@ -210,7 +208,7 @@ class IdeographContext(
             )
         )
 
-        var batchIndices = listOf(0)
+//        var batchIndices = listOf(0)
 
 
         while (true) {
@@ -504,6 +502,7 @@ class IdeographContext(
         it.fromId == from.getConceptId() && it.toId == to.getConceptId()
     }
 
+    @Deprecated("use evaluateNodes")
     suspend fun getConnectedNodeCandidates(
         from: PatternNode,
         to: PatternNode,
