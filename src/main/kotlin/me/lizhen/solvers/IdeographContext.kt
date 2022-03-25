@@ -23,6 +23,13 @@ data class PatternSolution(
     val edges: Map<String, WorkspaceEdge>,
 )
 
+@Serializable
+data class PatternSolutionResponse(
+    val solutions: List<PatternSolution>,
+    val elapsedTimeInMillis: Long,
+    val message: String?
+)
+
 fun PatternSolution.validate(pattern: Pattern): Boolean {
     return nodes.all { (pid, wn) ->
 
@@ -50,8 +57,9 @@ data class PatternSolutionUnderEvaluation(
     val edges: List<Pair<String, WorkspaceEdge?>>,
 ) {
     inline val isValid get() = nodes.all { it.second != null } && edges.all { it.second != null }
-    inline val isAllEvaluatedDistinct get() = nodes.mapNotNull { it.second }.run { distinct().size == size }
-            && edges.mapNotNull { it.second }.run { distinct().size == size }
+    inline val isAllEvaluatedDistinct
+        get() = nodes.mapNotNull { it.second }.run { distinct().size == size }
+                && edges.mapNotNull { it.second }.run { distinct().size == size }
 
     //    inline fun getNode(patternNode: PatternNode) = nodes.firstOrNull { n -> n.first == patternNode.patternId }
     inline fun getEdge(patternEdge: PatternEdge) = nodes.firstOrNull { n -> n.first == patternEdge.patternId }
@@ -167,7 +175,6 @@ class IdeographContext(
     lateinit var relationConceptFromDict: Map<Long, List<HasRelationConceptEdge>>
     lateinit var hasPropertyEdges: List<HasPropertyEdge>
     lateinit var propertyFromDict: Map<Long, List<HasPropertyEdge>>
-
 
     @Deprecated("Use solvePatternBatched instead.")
     suspend fun solvePattern(pattern: Pattern): List<PatternSolution> {
@@ -400,18 +407,6 @@ class IdeographContext(
             )
         )
 
-//        return mongoService
-//            .getCollection<WorkspaceNode>(node.type + "_node")
-//            .
-//            .countDocuments(
-//                and(
-//                    constraints.map {
-//                        WorkspaceNode::properties.keyProjection(it.property) regex it.value
-//                    }
-//                )
-//            )
-
-
     suspend fun queryNodeWithConstraints(
         node: PatternNode,
         vararg constraints: PatternConstraint
@@ -475,16 +470,15 @@ class IdeographContext(
         .getCollection<WorkspaceNode>(nodeTypeName + "_node")
         .find(
             clientSession,
-            and(WorkspaceNode::nodeId `in` nodeIds,
-                and(
-                    constraints.map {
-                        WorkspaceNode::properties.keyProjection(it.property) regex it.value
-                    }
-                ))
+            and(
+                constraints.map {
+                    WorkspaceNode::properties.keyProjection(it.property) regex it.value
+                } + (WorkspaceNode::nodeId `in` nodeIds)
+            )
         )
 
 
-    suspend fun queryEdges(
+    private suspend fun queryEdges(
         edgeTypeName: String,
         nodeFrom: List<WorkspaceNode>? = null,
         nodeTo: List<WorkspaceNode>? = null

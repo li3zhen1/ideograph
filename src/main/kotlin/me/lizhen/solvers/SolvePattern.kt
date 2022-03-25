@@ -9,7 +9,6 @@ import me.lizhen.schema.PatternConstraint
 import me.lizhen.schema.PatternNode
 import toIndexedPair
 import toInvertedMap
-import javax.swing.text.StyledEditorKit.BoldAction
 import kotlin.time.ExperimentalTime
 
 
@@ -247,10 +246,10 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
         val firstPatternNodeId = nodeConstraintPairs[entryNodePair.first].first.patternId
 
 
-        val edgePointIndices = pattern.edges.orEmpty().map { it -> emptySolution.getNodeIndices(it) }
+        val edgePointIndices = pattern.edges.orEmpty().map { emptySolution.getNodeIndices(it) }
         val nodeAsFromIndices = pattern.nodes.map { emptyList<Int>().toMutableList() }
         val nodeAsToIndices = pattern.nodes.map { emptyList<Int>().toMutableList() }
-        pattern.edges?.forEachIndexed { index, e ->
+        pattern.edges?.indices?.forEach { index ->
             nodeAsFromIndices[edgePointIndices[index].first] += index
             nodeAsToIndices[edgePointIndices[index].second] += index
         }

@@ -11,7 +11,13 @@ import me.lizhen.plugins.*
 import me.lizhen.schema.Pattern
 import me.lizhen.service.MongoService
 import me.lizhen.solvers.IdeographContext
+import me.lizhen.solvers.PatternSolutionResponse
+import me.lizhen.solvers.solvePatternBatched
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimeMark
+import kotlin.time.measureTimedValue
 
+@OptIn(ExperimentalTime::class)
 fun main() {
     embeddedServer(Netty, port = 8080, host = "localhost") {
         val mongoService = MongoService()
@@ -27,7 +33,15 @@ fun main() {
             }
             post("/solvePattern") {
                 val pattern = call.receive<Pattern>()
-                call.respond(context.solvePattern(pattern))
+                val (result, time) = measureTimedValue {
+                    context.solvePatternBatched(pattern)
+                }
+
+                call.respond(
+                    PatternSolutionResponse(
+                        result, time.inWholeMilliseconds, null
+                    )
+                )
             }
         }
 
