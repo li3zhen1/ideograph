@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import me.lizhen.schema.*
 import me.lizhen.service.*
+import org.bson.conversions.Bson
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.*
 
@@ -31,6 +32,7 @@ data class PatternSolutionResponse(
 )
 
 fun PatternSolution.validate(pattern: Pattern): Boolean {
+
     return nodes.all { (pid, wn) ->
 
         val pn = pattern.nodes.find {
@@ -40,6 +42,7 @@ fun PatternSolution.validate(pattern: Pattern): Boolean {
         val constraints = pattern.constraints?.filter {
             it.targetPatternId == pn.patternId
         }!!
+        if(constraints.isEmpty()) return true;
 
         return@all constraints.validate(wn)
     }
@@ -130,11 +133,13 @@ data class PatternSolutionUnderEvaluation(
     }
 
     inline fun completed(): PatternSolution? {
-        if (isValid)
+        if (isValid) {
             return PatternSolution(
                 nodes.associate { it.first to it.second!! },
                 edges.associate { it.first to it.second!! },
             )
+                //.also { println(it) }
+        }
         return null
     }
 
@@ -422,6 +427,7 @@ class IdeographContext(
                     }
                 )
             )
+            .batchSize(BATCH_SIZE)
 //        if (find.count() > MONGO_NODE_LIMIT) throw Error("Query maximum exceeded.")
         return find.toList()
     }
@@ -441,6 +447,8 @@ class IdeographContext(
                 }
             )
         )
+        .batchSize(BATCH_SIZE)
+    
 
     suspend fun queryNodeWithConstraints(
         nodeTypeName: String,
@@ -457,6 +465,7 @@ class IdeographContext(
                     }
                 )
             )
+            .batchSize(BATCH_SIZE)
 //        if (find.count() > MONGO_NODE_LIMIT) throw Error("Query maximum exceeded.")
         return find.toList()
     }
@@ -465,7 +474,8 @@ class IdeographContext(
         clientSession: ClientSession,
         nodeTypeName: String,
         nodeIds: List<Long>,
-        vararg constraints: PatternConstraint
+        vararg constraints: PatternConstraint,
+//        additionalConstraints: Bson? = null
     ) = mongoService
         .getCollection<WorkspaceNode>(nodeTypeName + "_node")
         .find(
@@ -473,9 +483,10 @@ class IdeographContext(
             and(
                 constraints.map {
                     WorkspaceNode::properties.keyProjection(it.property) regex it.value
-                } + (WorkspaceNode::nodeId `in` nodeIds)
+                } + (WorkspaceNode::nodeId `in` nodeIds) //+ additionalConstraints
             )
         )
+        .batchSize(BATCH_SIZE)
 
 
     private suspend fun queryEdges(
@@ -526,6 +537,8 @@ class IdeographContext(
             .database
             .getCollection<WorkspaceEdge>(edgeTypeName + "_edge")
             .find(and(filters))
+
+            .batchSize(BATCH_SIZE)
             .toList()
     }
 
@@ -556,6 +569,8 @@ class IdeographContext(
             .database
             .getCollection<WorkspaceEdge>(edgeTypeName + "_edge")
             .find(clientSession, and(filters))
+
+            .batchSize(BATCH_SIZE)
     }
 
     @Deprecated("use evaluateNodes")
@@ -579,6 +594,7 @@ class IdeographContext(
             mongoService
                 .getCollection<WorkspaceEdge>(it.name + "_edge")
                 .find(WorkspaceEdge::fromId `in` acceptableFromId)
+                .batchSize(BATCH_SIZE)
                 .limit(MONGO_NODE_LIMIT)
                 .toList()
         }
@@ -594,6 +610,7 @@ class IdeographContext(
             if (it.key.isNullOrEmpty()) return listOf()
             return mongoService.getCollection<WorkspaceNode>(it.key + "_node")
                 .find()
+                .batchSize(BATCH_SIZE)
                 .toList()
         }
         return collection
@@ -607,5 +624,6 @@ class IdeographContext(
     companion object {
         const val MONGO_NODE_LIMIT = 10000
         const val EVALUABLE_CANDIDATE_LIMIT = 1000
+        const val BATCH_SIZE = 100
     }
 }

@@ -1,18 +1,10 @@
 package me.lizhen
 
-import io.ktor.server.routing.*
-import io.ktor.http.*
-import io.ktor.shared.serialization.kotlinx.kotlinx.json.*
-import io.ktor.server.plugins.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.request.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlin.test.*
-import io.ktor.server.testing.*
 import kotlinx.coroutines.runBlocking
-import me.lizhen.plugins.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
 import me.lizhen.schema.*
 import me.lizhen.service.DgraphService
 import me.lizhen.service.MongoService
@@ -107,6 +99,9 @@ class ApplicationTest {
         )
     )
 
+
+    val break0328 = Json.decodeFromString<Pattern>("{\"nodes\":[{\"patternId\":\"YKQ7dAi9MoXVKFsYk6LGn\",\"type\":\"报警人\"},{\"patternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"type\":\"急救报警\"},{\"patternId\":\"CJXsc6VOBwA-pCXCEL0pk\",\"type\":\"受理人\"}],\"edges\":[{\"patternId\":\"iKzpaRzSQ31Huqw_Zzwa4\",\"fromPatternId\":\"YKQ7dAi9MoXVKFsYk6LGn\",\"toPatternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"type\":\"发起\"},{\"patternId\":\"a9dnXxdo47wVEWRNT2K4t\",\"fromPatternId\":\"CJXsc6VOBwA-pCXCEL0pk\",\"toPatternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"type\":\"受理\"}],\"constraints\":[{\"patternId\":\"fenKbcnNl5Thkpi0PcueK\",\"targetType\":\"Node\",\"targetPatternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"property\":\"流水号*\",\"operator\":\"MatchRegex\",\"value\":\"2019[0-9]+\"},{\"patternId\":\"Eqkd5n8Qmsjujus5RIIvx\",\"targetType\":\"Node\",\"targetPatternId\":\"YKQ7dAi9MoXVKFsYk6LGn\",\"property\":\"呼叫人*\",\"operator\":\"MatchRegex\",\"value\":\"李.+\"}]}")
+
     @OptIn(ExperimentalTime::class)
     private fun testPattern(pattern: Pattern): List<PatternSolution> {
         // WorkspaceNode::properties.keyProjection("呼叫人*") regex "李.+",
@@ -127,25 +122,25 @@ class ApplicationTest {
 
     @Test
     fun testRoot() {
-        val sol = testPattern(p1)
-        sol.forEach {
-            println(it.nodes["B"]?.properties)
-        }
-        assert(sol.all { it.validate(p1) })
+        val sol = testPattern(break0328)
+//        sol.forEach {
+//            println(it.nodes["B"]?.properties)
+//        }
+        assert(sol.all { it.validate(break0328) })
 
 
-        val sol2 = testPattern(p2)
-        sol2.forEach {
-            println(it.nodes["B"]?.properties)
-        }
-        assert(sol2.all { it.validate(p2) })
-
-        val sol3 = testPattern(p3)
-        sol3.forEach {
-            println(it.nodes["B"]?.properties)
-            // TODO: Run distinct
-        }
-        assert(sol3.all { it.validate(p3) })
+//        val sol2 = testPattern(p2)
+//        sol2.forEach {
+//            println(it.nodes["B"]?.properties)
+//        }
+//        assert(sol2.all { it.validate(p2) })
+//
+//        val sol3 = testPattern(p3)
+//        sol3.forEach {
+//            println(it.nodes["B"]?.properties)
+//            // TODO: Run distinct
+//        }
+//        assert(sol3.all { it.validate(p3) })
 
         // TODO: Lazy?
     }

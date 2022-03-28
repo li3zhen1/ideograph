@@ -53,7 +53,7 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
         }
 
         val entryNodePair = runBlocking {
-            getBestEntry(session, nodeConstraintPairs)
+            getBestEntry(session, nodeConstraintPairs.filter { it.second.isNotEmpty() })
         }
 
         /**
@@ -135,15 +135,19 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
                     else {
                         val toPattern = patternNodeDict[patternEdge.toPatternId]!!
 
+
                         val toTypeName = toPattern.type
-                        val toCandidates = queryNodeWithConstraints(
+                        val filteredToCandidates = queryNodeWithConstraints(
                             session,
                             toTypeName,
-                            eCandidates.map { e -> e.toId }
+                            eCandidates.map { e -> e.toId }.distinct(),
+                            *nodeConstraintPair[toPattern.patternId].orEmpty().toTypedArray()
                         ).toList()
-                        val filteredToCandidates = toCandidates.filter {
+
+//                        val filteredToCandidates = toCandidates
+/*                            toCandidates.filter {
                             nodeConstraintPair[toPattern.patternId].validate(it)
-                        }
+                        }*/
 
                         val fromNodeIndex = patternNodeIndexDict[patternEdge.fromPatternId]!!
 
@@ -177,14 +181,15 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
                     else {
                         val fromPattern = patternNodeDict[patternEdge.fromPatternId]!!
                         val fromTypeName = fromPattern.type
-                        val fromCandidates = queryNodeWithConstraints(
+                        val filteredFromCandidates = queryNodeWithConstraints(
                             session,
                             fromTypeName,
-                            eCandidates.map { e -> e.fromId }
+                            eCandidates.map { e -> e.fromId }.distinct(),
+                            *nodeConstraintPair[fromPattern.patternId].orEmpty().toTypedArray()
                         ).toList()
-                        val filteredFromCandidates = fromCandidates.filter {
-                            nodeConstraintPair[fromPattern.patternId].validate(it)
-                        }
+//                        val filteredFromCandidates = fromCandidates.filter {
+//                            nodeConstraintPair[fromPattern.patternId].validate(it)
+//                        }
                         val toNodeIndex = patternNodeIndexDict[patternEdge.toPatternId]!!
                         val solutionDict = solutionsToSolve.groupBy {
                             it.nodes[toNodeIndex].second!!.nodeId
