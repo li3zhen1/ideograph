@@ -22,6 +22,7 @@ fun IdeographContext.getBestEntry(
         val channels = nodeConstraintPairs.toIndexedPair().map {
             produce {
                 val count = countConstrainedNodes(clientSession, it.second.first, *it.second.second.toTypedArray())
+                delay(count*50)
                 send(Pair(it.first, count))
             }
         }
@@ -55,6 +56,8 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
         val entryNodePair = runBlocking {
             getBestEntry(session, nodeConstraintPairs.filter { it.second.isNotEmpty() })
         }
+
+        println(entryNodePair)
 
         /**
          * evaluate 1 pattern node batched
