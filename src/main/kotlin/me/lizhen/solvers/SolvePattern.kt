@@ -304,7 +304,17 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
             }.filter { it.isAllEvaluatedDistinct }
         }
 
-        return solutionPool.mapNotNull { it.completed() }.also { session.close() }
+
+
+        return solutionPool
+            .distinctBy { it.uniqKey() }
+            .mapNotNull { it.completed() }
+//            .also {
+//                it[0].edges.toList().forEachIndexed { i, e ->
+//                    println("$i   ${e.second}\n   -   ${it[1].edges.toList()[i].second}\n\n\n")
+//                }
+//            }
+            .also { session.close() }
     }
 
 //        patternNodeQueues.forEach { entry ->

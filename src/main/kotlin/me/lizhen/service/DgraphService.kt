@@ -5,7 +5,6 @@ import io.dgraph.DgraphGrpc
 import io.dgraph.DgraphProto
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.*
-import me.lizhen.schema.PatternNode
 import me.lizhen.schema.RelationNode
 
 class DgraphService(

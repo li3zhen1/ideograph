@@ -5,7 +5,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import me.lizhen.schema.*
 import me.lizhen.service.*
-import org.bson.conversions.Bson
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.*
 
@@ -61,8 +60,8 @@ data class PatternSolutionUnderEvaluation(
 ) {
     inline val isValid get() = nodes.all { it.second != null } && edges.all { it.second != null }
     inline val isAllEvaluatedDistinct
-        get() = nodes.mapNotNull { it.second }.run { distinct().size == size }
-                && edges.mapNotNull { it.second }.run { distinct().size == size }
+        get() = nodes.mapNotNull { it.second?.nodeId }.run { distinct().size == size }
+                && edges.mapNotNull { it.second?.edgeId }.run { distinct().size == size }
 
     //    inline fun getNode(patternNode: PatternNode) = nodes.firstOrNull { n -> n.first == patternNode.patternId }
     inline fun getEdge(patternEdge: PatternEdge) = nodes.firstOrNull { n -> n.first == patternEdge.patternId }
@@ -143,6 +142,9 @@ data class PatternSolutionUnderEvaluation(
         return null
     }
 
+    inline fun uniqKey(): String = nodes.joinToString { it.second?.nodeId.toString() }
+
+
     companion object {
 //        const val EDGE_EVALUATED = -1
 //        const val EDGE_FROM_EVALUABLE = 0
@@ -150,6 +152,12 @@ data class PatternSolutionUnderEvaluation(
     }
 }
 
+
+fun PatternSolution.uniqKey(): String = nodes.toList().joinToString("") {
+    it.second.nodeId.toString()
+} + edges.toList().joinToString("") {
+    it.second.edgeId.toString()
+}
 
 /**
  * assuming is paired
