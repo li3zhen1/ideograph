@@ -129,6 +129,7 @@ class ApplicationTest {
         assert(sol.all { it.validate(break0328) })
 
 
+
 //        val sol2 = testPattern(p2)
 //        sol2.forEach {
 //            println(it.nodes["B"]?.properties)
