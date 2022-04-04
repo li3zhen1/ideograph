@@ -2,7 +2,7 @@ package me.lizhen.algorithms
 
 
 enum class LogicOperator(val value: Int) {
-    And(0), Or(1), Not(2), Xor(3),
+    And(0), Or(1), Not(2), Xor(3), Xnor(4)
 }
 
 
@@ -20,6 +20,7 @@ open class CompositePredictable<T : IPredictable>(
         LogicOperator.Or -> children.any { it.predicate() }
         LogicOperator.Not -> !(children[0].predicate())
         LogicOperator.Xor -> children[0].predicate() xor children[1].predicate()
+        LogicOperator.Xnor -> !(children[0].predicate() xor children[1].predicate())
     }
 }
 

@@ -2,96 +2,17 @@ package me.lizhen.algorithms
 
 import kotlin.math.*
 
-fun permutations(value: Term, exclude: Set<Term> = setOf()) = sequence {
-    val nBits = value.size
-    val nXor = value.count { it == '^' || it == '~' }
-    var xorValue = 0
-    var seenXor = 0
-    val res = Term(nBits) //value.map { '0' }.toMutableList()
-    var i = 0
-    var direction = +1
-    while (i >= 0) {
-        when (value[i]) {
-            '1', '0' -> res[i] = value[i]
-            '-' -> {
-                if (direction == +1) {
-                    res[i] = '0'
-                } else if (res[i] == '0') {
-                    res[i] = '1'
-                    direction = +1
-                }
-            }
-            '^' -> {
-                seenXor += direction
-                if (direction == +1) {
-                    res[i] = if (seenXor == nXor && xorValue == 0) '1' else '0'
-                } else if (res[i] == '0' && seenXor < nXor - 1) {
-                    res[i] = '1'
-                    direction = +1
-                    seenXor += 1
-                }
-                if (res[i] == '1') {
-                    xorValue = xorValue xor 1
-                }
-            }
-            '~' -> {
-                seenXor += direction
-                if (direction == +1) {
-                    res[i] = if (seenXor == nXor && xorValue == 1) '1' else '0'
-                } else if (res[i] == '0' && seenXor < nXor - 1) {
-                    res[i] = '1'
-                    direction = +1
-                    seenXor += 1
-                }
-                if (res[i] == '1') {
-                    xorValue = xorValue xor 1
-                }
-            }
-            else -> res[i] = '#'
-        }
-        i += direction
-        if (i == nBits) {
-            direction = -1
-            i = nBits - 1
-
-            if (!exclude.contains(res)) {
-                yield(res)
-            }
-        }
-    }
-}.toList()
-
-fun getIndicesFromTerm(term: Term, char: Char) = sequence {
-    term.forEachIndexed { i, c -> if (c == char) yield(i) }
-}
-
-fun combine(a: Term, b: Term, dontCares: Set<Term>): Term? {
-    val permutationsA = permutations(a, dontCares).toSet()
-    val permutationsB = permutations(b, dontCares).toSet()
-    val aTermDontCares = a.getIndicesOf('-').toList()
-    val bTermDontCares = b.getIndicesOf('-').toList()
-    val aPotential = a.copyOf()
-    val bPotential = b.copyOf()
-    aTermDontCares.indices.forEach { aPotential[it] = b[it] }
-    bTermDontCares.indices.forEach { bPotential[it] = a[it] }
-    val valid = listOf(aPotential, bPotential).filter {
-        permutations(it, dontCares) == permutationsA + permutationsB
-    }
-    if (valid.isEmpty()) return null
-    return valid.sortedBy { it.getComplexity() }[0]
-}
-
-object QuineMcCluskey{
-    private var nBits = 0
+class QuineMcCluskey(
+    private var nBits: Int = 0,
     private val useXor: Boolean = false
+) {
+
     fun simplify(
         ones: IntArray,
         dontCares: IntArray = IntArray(0),
     ): Set<Term> {
-        val terms = ones + dontCares
-        if (terms.isEmpty()) return setOf()
+        if (ones.isEmpty() && dontCares.isEmpty()) return setOf()
         nBits = ceil(log2(1.0 + (ones + dontCares).maxOrNull()!!)).toInt()
-
         return simplify(
             ones.map { it.toTerm(nBits) }.toSet(),
             dontCares.map { it.toTerm(nBits) }.toSet(),
@@ -106,7 +27,6 @@ object QuineMcCluskey{
     ): Set<Term> {
         val terms = (ones + dontCares)
         if (terms.isEmpty()) return setOf()
-
         val nBits = numBits ?: terms.maxOf { it.size }
         if (nBits != terms.minOf { it.size }) return setOf()
 
@@ -118,7 +38,6 @@ object QuineMcCluskey{
     private fun reduceImplicants(implicants: MutableSet<Term>, dontCares: Set<Term>): Set<Term> {
         while (true) {
             val combinations = implicants.flatMap { a -> implicants.map { b -> a to b } }
-
             for ((a, b) in combinations) {
                 val combined = combine(a, b, dontCares)
                 if (combined !== null) {
@@ -128,12 +47,12 @@ object QuineMcCluskey{
                     break
                 }
             }
-            // ?
             break
         }
         var coverage = implicants.associateWith {
-            permutations(it).filter { p -> !dontCares.contains(p) }
+            it.permutationExcluding().filter { p -> !dontCares.contains(p) }
         }.toMutableMap()
+
         while (true) {
             val redundant = mutableListOf<Term>()
             coverage.forEach { (thisImplicant, thisCoverage) ->
@@ -298,21 +217,20 @@ object QuineMcCluskey{
             groups.values.forEach {
                 marked = marked + (it - used)
             }
-            if (used.isEmpty()) { done = true }
+            if (used.isEmpty())  done = true
         }
 
         val pi = marked.toMutableSet()
         groups.values.forEach {
             pi += it
         }
-
         return pi
     }
 
     private fun getEssentialImplicants(
         terms: Set<Term>, dontCareSets: Set<Term>
     ): MutableSet<Term> {
-        val perms = terms.associateWith { permutations(it).filter { p -> dontCareSets.contains(p) } }
+        val perms = terms.associateWith { it.permutationExcluding().filter { p -> dontCareSets.contains(p) } }
         var eiRanges = setOf<Term>()
         val ei = mutableSetOf<Term>()
         val groups = terms.groupBy { getTermRank(it, perms[it]!!.size) }
@@ -339,5 +257,18 @@ object QuineMcCluskey{
             '1' -> 1
             else -> 0
         }
+    }
+
+    companion object {
+
+        private val simpleSolver = QuineMcCluskey()
+
+        public fun simplify(
+            ones: IntArray,
+            dontCares: IntArray = IntArray(0),
+        ) = simpleSolver.simplify(ones, dontCares)
+
+        public fun simplify(vararg ones: Int) = simpleSolver.simplify(ones)
+
     }
 }
