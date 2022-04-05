@@ -28,25 +28,17 @@ suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): L
         )
         val splitConstraints = constraintContext.splitSyntaxTree() ?: return emptyList()
 
-
         val channel = Channel<List<PatternSolution>>()
         splitConstraints.forEachIndexed { index, it ->
             CoroutineScope(Dispatchers.IO).launch {
                 produce<List<PatternSolution>> {
-                    val pattern = Pattern(
+                    val narrowedPattern = Pattern(
                         pattern.nodes,
                         pattern.edges,
                         it.unzip().first
                     )
-                    println("[Composite Solver] Starting Coroutine $index: ${pattern}\n\n")
-
-                    val result = solvePatternBatched(
-                        Pattern(
-                            pattern.nodes,
-                            pattern.edges,
-                            it.unzip().first
-                        )
-                    )
+                    println("[Composite Solver] Starting Coroutine $index: ${narrowedPattern}\n\n")
+                    val result = solvePatternBatched(narrowedPattern)
                     println("[Composite Solver] Finishing Coroutine $index with ${result.size} results.")
                     channel.send(result)
                 }
@@ -60,41 +52,6 @@ suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): L
         coroutineContext.cancelChildren()
         return solutions
 
-//        val solutionChannel = Channel<List<PatternSolution>>()
-//
-////        println(splitConstraints)
-//
-//        splitConstraints.forEach {
-//            println(it)
-//            withContext(Dispatchers.IO) {
-//                launch {
-//                    solutionChannel.send(
-//                        solvePatternBatched(
-//                            Pattern(
-//                                pattern.nodes,
-//                                pattern.edges,
-//                                it.unzip().first
-//                            )
-//                        ).also { println(it) }
-//                    )
-//                }
-//            }
-//        }
-//
-//            val allSolutions = mutableListOf<PatternSolution>()
-//            val selected = select<List<PatternSolution>> {
-//                solutionChannels.map { channel ->
-//                    channel.onReceive { it }
-//                }
-//            }
-//            allSolutions += selected
-//
-//            return@withContext allSolutions
-
-//        val result = mutableListOf<PatternSolution>()
-//        repeat(splitConstraints.size) {
-//            result += solutionChannel.receive()
-//        }
     } else {
         return solvePatternBatched(
             Pattern(

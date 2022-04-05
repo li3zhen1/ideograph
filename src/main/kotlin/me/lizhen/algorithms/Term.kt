@@ -26,12 +26,8 @@ data class Term(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Term
-
+        if (other !is Term) return false
         if (!chars.contentEquals(other.chars)) return false
-
         return true
     }
 

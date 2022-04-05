@@ -6,13 +6,13 @@ open class DisjointSet<T, K : Comparable<K>>(
     private val nodes: Collection<T>,
     private val getId: T.() -> K
 ) {
-    private val parentMap = nodes.associateBy(getId).toMutableMap()
-    private val rankMap = nodes.associate { it.getId() to 0 }.toMutableMap()
+    protected val parentMap = nodes.associateBy(getId).toMutableMap()
+    protected val rankMap = nodes.associate { it.getId() to 0 }.toMutableMap()
     public val sizeMap = nodes.associate { it.getId() to 1 }.toMutableMap()
-    private val nodeMap = nodes.associateBy(getId)
+    protected val nodeMap = nodes.associateBy(getId)
     public var rootCount: Int = nodes.count()
 
-    private fun findSet(item: T): T {
+    protected fun findSet(item: T): T {
         val id = item.getId()
         if (parentMap[id] !== item) {
             parentMap[id] = findSet(parentMap[id]!!)
@@ -20,7 +20,7 @@ open class DisjointSet<T, K : Comparable<K>>(
         return parentMap[id]!!
     }
 
-    private fun findSet(id: K): T {
+    protected fun findSet(id: K): T {
         val item = nodeMap[id]
         if (parentMap[id] !== item) {
             parentMap[id] = findSet(parentMap[id]!!)
@@ -28,7 +28,7 @@ open class DisjointSet<T, K : Comparable<K>>(
         return parentMap[id]!!
     }
 
-    public fun union(parent: T, child: T): DisjointSet<T, K> {
+    public open fun union(parent: T, child: T): DisjointSet<T, K> {
         if (includes(parent) && includes(child)) {
             var xRep = findSet(parent)
             var yRep = findSet(child)
@@ -38,7 +38,8 @@ open class DisjointSet<T, K : Comparable<K>>(
                 val rankDiff = rankMap[xRepId]!! - rankMap[yRepId]!!
                 if (rankDiff == 0) {
                     rankMap[xRepId] = rankMap[xRepId]!! + 1
-                } else if (rankDiff < 0) {
+                }
+                else if (rankDiff < 0) {
                     xRep = yRep.also { yRep = xRep }
                     xRepId = yRepId.also { yRepId = xRepId }
                 }
@@ -51,8 +52,8 @@ open class DisjointSet<T, K : Comparable<K>>(
         return this
     }
 
-    private inline fun includes(item: T) = parentMap.contains(item.getId())
-    private inline fun includes(item: K) = parentMap.contains(item)
+    protected fun includes(item: T) = parentMap.contains(item.getId())
+    protected fun includes(item: K) = parentMap.contains(item)
 
     public fun isRepresentative(item: T): Boolean {
         if (!includes(item)) return false
@@ -63,16 +64,28 @@ open class DisjointSet<T, K : Comparable<K>>(
 
 }
 
-//class DynamicDisjointSet<T, K : Comparable<K>>(
-//    private val nodes: Collection<T>,
-//    private val getId: T.() -> K
-//) : DisjointSet<T, K>(nodes, getId) {
-//    public fun addNode(item: T): DynamicDisjointSet<T, K> {
-//        val id = item.getId()
-//        parentMap[id] = item
-//        sizeMap[id] = 1
-//        rankMap[id] = 1
-//        rootCount ++
-//        return this
-//    }
-//}
+
+class DirectedDisjointSet<T, K : Comparable<K>>(
+    private val nodes: Collection<T>,
+    private val getId: T.() -> K
+): DisjointSet<T, K>(nodes, getId) {
+    override fun union(parent: T, child: T): DisjointSet<T, K> {
+        if (includes(parent) && includes(child)) {
+            val xRep = findSet(parent)
+            val yRep = findSet(child)
+            val xRepId = xRep.getId()
+            val yRepId = yRep.getId()
+            if (xRepId !== yRepId) {
+                val rankDiff = rankMap[xRepId]!! - rankMap[yRepId]!!
+                if (rankDiff == 0) {
+                    rankMap[xRepId] = rankMap[xRepId]!! + 1
+                }
+                this.parentMap[yRepId] = xRep
+                sizeMap[xRepId] = sizeMap[xRepId]!! + sizeMap[yRepId]!!
+                sizeMap.remove(yRepId)
+                rootCount -= 1
+            }
+        }
+        return this
+    }
+}

@@ -16,7 +16,7 @@ class ConstraintContext(
 
     private fun getRootId(): String? {
 
-        val disjointSet = DisjointSet(allPatterns) { patternId }
+        val disjointSet = DirectedDisjointSet(allPatterns) { patternId }
 
         connections.forEach { (from, to) ->
             val fromPattern = allPatternMap[from]
