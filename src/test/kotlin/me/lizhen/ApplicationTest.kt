@@ -121,6 +121,12 @@ class ApplicationTest {
     }
 
     @Test
+    fun test1() {
+        val sol = testPattern(p1)
+        assert(sol.all { it.validate(p1) })
+    }
+
+    @Test
     fun testRoot() {
         val sol = testPattern(break0328)
 //        sol.forEach {

@@ -2,12 +2,18 @@ package me.lizhen.schema
 
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
+import me.lizhen.algorithms.ConstraintContext
+import me.lizhen.algorithms.LogicOperator
+
+interface IdentifiablePattern {
+    val patternId: String
+}
 
 @Serializable
 data class PatternNode(
-    val patternId: String,
+    override val patternId: String,
     val type: String
-)
+): IdentifiablePattern
 
 @Serializable
 enum class PatternType(val value: Int) {
@@ -24,25 +30,25 @@ enum class ComparisonOperator(val value: Int) {
 
 @Serializable
 data class PatternConstraint(
-    val patternId: String,
+    override val patternId: String,
     val targetType: PatternType,
     val targetPatternId: String,
 
     val property: String,
     val operator: ComparisonOperator,
     val value: String
-)
+): IdentifiablePattern
 
 
 @Serializable
 data class PatternEdge(
-    val patternId: String,
+    override val patternId: String,
 
     val type: String,
 
     val fromPatternId: String,
     val toPatternId: String,
-)
+): IdentifiablePattern
 
 
 @Serializable
@@ -50,4 +56,26 @@ data class Pattern(
     val nodes: List<PatternNode>,
     val edges: List<PatternEdge>?,
     val constraints: List<PatternConstraint>?
+)
+
+@Serializable
+data class PatternLogicOperator(
+    override val patternId: String,
+    val type: LogicOperator
+) : IdentifiablePattern
+
+@Serializable
+data class ConstraintConnection(
+    val from: String,
+    val to: String
+)
+
+@Serializable
+data class CompositePattern(
+    val nodes: List<PatternNode>,
+    val edges: List<PatternEdge>?,
+    val constraints: List<PatternConstraint>?,
+
+    val logicOperators: List<PatternLogicOperator>?,
+    val connections: List<ConstraintConnection>?
 )

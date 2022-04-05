@@ -1,21 +1,31 @@
 package me.lizhen.algorithms
 
-class DisjointSet<T, K : Comparable<K>>(
+import org.litote.kmongo.util.idValue
+
+open class DisjointSet<T, K : Comparable<K>>(
     private val nodes: Collection<T>,
     private val getId: T.() -> K
 ) {
-    private val parent = nodes.associateBy { it.getId() }.toMutableMap()
-    private val rank = nodes.associate { it.getId() to 0 }.toMutableMap()
-    private val size = nodes.associate { it.getId() to 1 }.toMutableMap()
-
-    public var setCount: Int = nodes.count()
+    private val parentMap = nodes.associateBy(getId).toMutableMap()
+    private val rankMap = nodes.associate { it.getId() to 0 }.toMutableMap()
+    public val sizeMap = nodes.associate { it.getId() to 1 }.toMutableMap()
+    private val nodeMap = nodes.associateBy(getId)
+    public var rootCount: Int = nodes.count()
 
     private fun findSet(item: T): T {
         val id = item.getId()
-        if (parent[id] !== item) {
-            parent[id] = findSet(parent[id]!!)
+        if (parentMap[id] !== item) {
+            parentMap[id] = findSet(parentMap[id]!!)
         }
-        return parent[id]!!
+        return parentMap[id]!!
+    }
+
+    private fun findSet(id: K): T {
+        val item = nodeMap[id]
+        if (parentMap[id] !== item) {
+            parentMap[id] = findSet(parentMap[id]!!)
+        }
+        return parentMap[id]!!
     }
 
     public fun union(parent: T, child: T): DisjointSet<T, K> {
@@ -25,29 +35,44 @@ class DisjointSet<T, K : Comparable<K>>(
             var xRepId = xRep.getId()
             var yRepId = yRep.getId()
             if (xRepId !== yRepId) {
-                val rankDiff = rank[xRepId]!! - rank[yRepId]!!
+                val rankDiff = rankMap[xRepId]!! - rankMap[yRepId]!!
                 if (rankDiff == 0) {
-                    rank[xRepId] = rank[xRepId]!! + 1
+                    rankMap[xRepId] = rankMap[xRepId]!! + 1
                 } else if (rankDiff < 0) {
                     xRep = yRep.also { yRep = xRep }
                     xRepId = yRepId.also { yRepId = xRepId }
                 }
-                this.parent[yRepId] = xRep
-                size[xRepId] = size[yRepId]!!
-                size.remove(yRepId)
-                setCount -= 1
+                this.parentMap[yRepId] = xRep
+                sizeMap[xRepId] = sizeMap[xRepId]!! + sizeMap[yRepId]!!
+                sizeMap.remove(yRepId)
+                rootCount -= 1
             }
         }
         return this
     }
 
-    private fun includes(item: T) = parent.contains(item.getId())
+    private inline fun includes(item: T) = parentMap.contains(item.getId())
+    private inline fun includes(item: K) = parentMap.contains(item)
 
     public fun isRepresentative(item: T): Boolean {
         if (!includes(item)) return false
-        return parent[item.getId()] == item
+        return parentMap[item.getId()] == item
     }
 
-    public fun isSingleton(item: T) = size[item.getId()] == 1
+    public fun isSingleton(item: T) = sizeMap[item.getId()] == 1
 
 }
+
+//class DynamicDisjointSet<T, K : Comparable<K>>(
+//    private val nodes: Collection<T>,
+//    private val getId: T.() -> K
+//) : DisjointSet<T, K>(nodes, getId) {
+//    public fun addNode(item: T): DynamicDisjointSet<T, K> {
+//        val id = item.getId()
+//        parentMap[id] = item
+//        sizeMap[id] = 1
+//        rankMap[id] = 1
+//        rootCount ++
+//        return this
+//    }
+//}

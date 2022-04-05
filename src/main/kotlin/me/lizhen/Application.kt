@@ -8,10 +8,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import me.lizhen.service.DgraphService
 import me.lizhen.plugins.*
+import me.lizhen.schema.CompositePattern
 import me.lizhen.schema.Pattern
 import me.lizhen.service.MongoService
 import me.lizhen.solvers.IdeographContext
 import me.lizhen.solvers.PatternSolutionResponse
+import me.lizhen.solvers.solveCompositePattern
 import me.lizhen.solvers.solvePatternBatched
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeMark
@@ -37,6 +39,17 @@ fun main() {
                     context.solvePatternBatched(pattern)
                 }
 
+                call.respond(
+                    PatternSolutionResponse(
+                        result, time.inWholeMilliseconds, null
+                    )
+                )
+            }
+            post("/solveCompositePattern") {
+                val pattern = call.receive<CompositePattern>()
+                val (result, time) = measureTimedValue {
+                    context.solveCompositePattern(pattern)
+                }
                 call.respond(
                     PatternSolutionResponse(
                         result, time.inWholeMilliseconds, null

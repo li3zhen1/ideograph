@@ -35,7 +35,6 @@ fun IdeographContext.getBestEntry(
 }
 
 
-@OptIn(ExperimentalTime::class)
 suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<PatternSolution> =
     mongoService.startSession().use { session ->
         val patternNodeDict = pattern.nodes.associateBy { it.patternId }
