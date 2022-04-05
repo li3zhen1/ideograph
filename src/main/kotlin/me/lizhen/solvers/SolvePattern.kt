@@ -9,7 +9,6 @@ import me.lizhen.schema.PatternConstraint
 import me.lizhen.schema.PatternNode
 import toIndexedPair
 import toInvertedMap
-import kotlin.time.ExperimentalTime
 
 
 @OptIn(ExperimentalCoroutinesApi::class)

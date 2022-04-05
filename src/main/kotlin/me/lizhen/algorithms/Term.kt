@@ -74,6 +74,8 @@ data class Term(
     }
 
     inline fun permutationExcluding(exclude: Set<Term> = setOf()) = permutations(this, exclude)
+    inline fun permutation() = permutations(this)
+
 
     companion object {
 

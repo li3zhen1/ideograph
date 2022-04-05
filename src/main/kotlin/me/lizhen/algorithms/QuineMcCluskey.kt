@@ -50,7 +50,7 @@ class QuineMcCluskey(
             break
         }
         var coverage = implicants.associateWith {
-            it.permutationExcluding().filter { p -> !dontCares.contains(p) }
+            it.permutation().filter { p -> !dontCares.contains(p) }
         }.toMutableMap()
 
         while (true) {
@@ -230,7 +230,7 @@ class QuineMcCluskey(
     private fun getEssentialImplicants(
         terms: Set<Term>, dontCareSets: Set<Term>
     ): MutableSet<Term> {
-        val perms = terms.associateWith { it.permutationExcluding().filter { p -> dontCareSets.contains(p) } }
+        val perms = terms.associateWith { it.permutation().filter { p -> dontCareSets.contains(p) } }
         var eiRanges = setOf<Term>()
         val ei = mutableSetOf<Term>()
         val groups = terms.groupBy { getTermRank(it, perms[it]!!.size) }
