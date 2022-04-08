@@ -3,13 +3,11 @@ package me.lizhen.algorithms
 import me.lizhen.schema.IdentifiablePattern
 import me.lizhen.schema.PatternConstraint
 import me.lizhen.schema.PatternLogicOperator
-import org.bson.conversions.Bson
 import kotlin.math.pow
 
 enum class LogicOperator(val value: Int) {
     And(0), Or(1), Not(2), Xor(3), Xnor(4)
 }
-
 
 
 interface Traversable {
@@ -22,6 +20,7 @@ interface Traversable {
     }
 }
 
+
 data class ConstraintSyntaxNode(
     val content: IdentifiablePattern,
     override var children: List<ConstraintSyntaxNode>? = null,
@@ -29,11 +28,10 @@ data class ConstraintSyntaxNode(
     inline fun fill(
         getChildren: PatternLogicOperator.() -> List<IdentifiablePattern>
     ): List<ConstraintSyntaxNode>? {
-        if (content is PatternConstraint) {
-            return null
+        return if (content is PatternConstraint) {
+            null
         } else {
-            content as PatternLogicOperator
-            children = content.getChildren().map {
+            children = (content as PatternLogicOperator).getChildren().map {
                 ConstraintSyntaxNode(it)
             }
             return children
@@ -56,7 +54,7 @@ data class ConstraintSyntaxNode(
         return constraintIds.toList()
     }
 
-    fun predicate(eval: (IdentifiablePattern) -> Boolean): Boolean {
+    private fun predicate(eval: (IdentifiablePattern) -> Boolean): Boolean {
         return if (content is PatternConstraint) {
             eval(content)
         } else {

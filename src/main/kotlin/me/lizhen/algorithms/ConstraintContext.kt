@@ -40,11 +40,12 @@ class ConstraintContext(
                 visiting = visiting.flatMap {
                     it.fill {
                         connections
-                            .filter { (from, to) -> patternId == to }
-                            .mapNotNull { (from, to) -> allPatternMap[from] }
+                            .filter { (_, to) -> patternId == to }
+                            .mapNotNull { (from, _) -> allPatternMap[from] }
                     }.orEmpty()
                 }
             }
+
             return root
         }
     }

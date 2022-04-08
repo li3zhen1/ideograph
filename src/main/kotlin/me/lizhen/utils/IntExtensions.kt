@@ -2,5 +2,4 @@
 
 package me.lizhen.utils
 
-
 inline fun Int.toBinaryString() = Integer.toBinaryString(this)

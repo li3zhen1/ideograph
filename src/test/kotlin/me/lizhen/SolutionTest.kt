@@ -191,6 +191,81 @@ class SolutionTest {
         )
     )
 
+
+
+    val flattenTest = CompositePattern(
+        listOf(
+            PatternNode("A", "报警人"),
+            PatternNode("B", "急救报警")
+        ),
+        listOf(
+            PatternEdge(
+                fromPatternId = "A",
+                toPatternId = "B",
+                patternId = "A->B",
+                type = "发起",
+            )
+        ),
+        listOf(
+            PatternConstraint(
+                targetType = PatternType.Node,
+                targetPatternId = "A",
+                patternId = "C1",
+                property = "呼叫人*",
+                operator = ComparisonOperator.MatchRegex,
+                value = "李.+"
+            ),
+            PatternConstraint(
+                targetType = PatternType.Node,
+                targetPatternId = "A",
+                patternId = "C2",
+                property = "呼叫人*",
+                operator = ComparisonOperator.MatchRegex,
+                value = "吴.+"
+            ),
+            PatternConstraint(
+                targetType = PatternType.Node,
+                targetPatternId = "A",
+                patternId = "female",
+                property = "呼叫人*",
+                operator = ComparisonOperator.MatchRegex,
+                value = ".+小姐"
+            ),
+            PatternConstraint(
+                targetType = PatternType.Node,
+                targetPatternId = "A",
+                patternId = "male",
+                property = "呼叫人*",
+                operator = ComparisonOperator.MatchRegex,
+                value = ".+先生"
+            )
+        ),
+        listOf(
+            PatternLogicOperator(
+                patternId = "or-root",
+                type = LogicOperator.And,
+            ),
+            PatternLogicOperator(
+                patternId = "and-male",
+                type = LogicOperator.And,
+            ),
+            PatternLogicOperator(
+                patternId = "and-female",
+                type = LogicOperator.And,
+            ),
+        ),
+        listOf(
+            ConstraintConnection("C1", "and-female"),
+            ConstraintConnection("female", "and-female"),
+
+            ConstraintConnection("C2", "and-male"),
+            ConstraintConnection("male", "and-male"),
+
+            ConstraintConnection("and-male", "or-root"),
+            ConstraintConnection("and-female", "or-root"),
+        )
+    )
+
     /**
      * 报警人姓李或吴
      */
@@ -221,6 +296,18 @@ class SolutionTest {
     fun test3() {
         val sol = runBlocking {
             ctx.solveCompositePattern(cp3)
+        }
+        println(sol)
+    }
+
+
+    /**
+     * 报警人 (姓李 且 小姐) and (姓吴 且 先生)
+     */
+    @Test
+    fun flattenTest() {
+        val sol = runBlocking {
+            ctx.solveCompositePattern(flattenTest)
         }
         println(sol)
     }
