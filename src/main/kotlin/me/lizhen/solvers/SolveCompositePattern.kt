@@ -17,6 +17,12 @@ const val maxCoroutineChannels = 64
 
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): List<PatternSolution> {
+    println("=========== new session ==========")
+    println(pattern.nodes.size)
+    println(pattern.edges?.size)
+    println(pattern.connections?.size)
+    println(pattern.constraints?.size)
+    println(pattern.logicOperators?.size)
     if (pattern.constraints !== null
         && pattern.logicOperators !== null
         && pattern.connections !== null
@@ -28,6 +34,9 @@ suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): L
         )
         val splitConstraints = constraintContext.splitSyntaxTree() ?: return emptyList()
 
+        splitConstraints.forEachIndexed { index, it ->
+            println("[Logic $index] $it")
+        }
         val channel = Channel<List<PatternSolution>>()
         splitConstraints.forEachIndexed { index, it ->
             CoroutineScope(Dispatchers.IO).launch {
@@ -37,7 +46,7 @@ suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): L
                         pattern.edges,
                         it.unzip().first
                     )
-                    println("[Composite Solver] Starting Coroutine $index: ${narrowedPattern}\n\n")
+                    println("[Composite Solver] Starting Coroutine $index: ${narrowedPattern}")
                     val result = solvePatternBatched(narrowedPattern)
                     println("[Composite Solver] Finishing Coroutine $index with ${result.size} results.")
                     channel.send(result)
@@ -48,7 +57,9 @@ suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): L
         val solutions = mutableListOf<PatternSolution>()
         repeat(splitConstraints.size) {
             solutions += channel.receive()
+            print(solutions.size)
         }
+
         coroutineContext.cancelChildren()
         return solutions
 

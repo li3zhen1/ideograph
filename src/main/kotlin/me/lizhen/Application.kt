@@ -33,6 +33,7 @@ fun main() {
             get("/schema") {
                 call.respond(context.schema)
             }
+
             post("/solvePattern") {
                 val pattern = call.receive<Pattern>()
                 val (result, time) = measureTimedValue {
@@ -45,6 +46,7 @@ fun main() {
                     )
                 )
             }
+
             post("/solveCompositePattern") {
                 val pattern = call.receive<CompositePattern>()
                 val (result, time) = measureTimedValue {
