@@ -1,21 +1,22 @@
 package me.lizhen.utils
 
+import java.time.LocalDateTime
 import java.time.LocalTime
 
-inline fun <T>withTimeMeasure(closure: ()->T): Pair<Int, T> {
-    val start = LocalTime.now().nano
+inline fun <T>withTimeMeasure(closure: ()->T): Pair<Long, T> {
+    val start = System.currentTimeMillis()
     val result = closure()
-    val end = LocalTime.now().nano
+    val end = System.currentTimeMillis()
     return Pair(
-        (end - start) / 1000,
+        (end - start),
         result
     )
 }
 
 
-inline fun measureElapsedTime(closure: ()->Unit): Int {
-    val start = LocalTime.now().nano
+inline fun measureElapsedTime(closure: ()->Unit): Long {
+    val start = System.currentTimeMillis()
     closure()
-    val end = LocalTime.now().nano
-    return (end - start) / 1000
+    val end = System.currentTimeMillis()
+    return (end - start)
 }
