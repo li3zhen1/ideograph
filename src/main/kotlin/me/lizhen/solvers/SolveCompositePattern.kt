@@ -64,6 +64,7 @@ suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): L
         return solutions
 
     } else {
+
         return solvePatternBatched(
             Pattern(
                 pattern.nodes,

@@ -21,9 +21,9 @@ import me.lizhen.utils.withTimeMeasure
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "localhost") {
-        val mongoService = MongoService()
-        val dgraphService = DgraphService(mongoService)
-        val context = IdeographContext(mongoService, dgraphService)
+        val mongoService = MongoService(27026)
+//        val dgraphService = DgraphService(mongoService)
+        val context = IdeographContext(mongoService)
 
         configureRouting()
         configureSerialization()

@@ -5,8 +5,9 @@ import org.litote.kmongo.reactivestreams.*
 import org.litote.kmongo.coroutine.*
 
 class MongoService(
-    hostAddress: String = "162.105.88.139",
     port: Int = 27025,
+    hostAddress: String = "162.105.88.139",
+
     userName: String = "rootxyx",
     password: String = "woxnsk!",
     databaseName: String = "relation"

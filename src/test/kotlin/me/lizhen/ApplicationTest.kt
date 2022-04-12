@@ -19,8 +19,8 @@ class ApplicationTest {
 
 
     private val mongoService = MongoService()
-    private val dgraphService = DgraphService(mongoService)
-    private val ctx = IdeographContext(mongoService, dgraphService)
+//    private val dgraphService = DgraphService(mongoService)
+    private val ctx = IdeographContext(mongoService)
 
 
     val pnA = PatternNode("A", "报警人")

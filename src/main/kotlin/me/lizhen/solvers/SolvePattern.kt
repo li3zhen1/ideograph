@@ -36,6 +36,7 @@ fun IdeographContext.getBestEntry(
 
 suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<PatternSolution> =
     mongoService.startSession().use { session ->
+        println(pattern)
         val patternNodeDict = pattern.nodes.associateBy { it.patternId }
         val patternNodeIndexDict = pattern.nodes.toInvertedMap { it.patternId }
 
@@ -52,7 +53,7 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
         }
 
         val entryNodePair = runBlocking {
-            getBestEntry(session, nodeConstraintPairs.filter { it.second.isNotEmpty() })
+            getBestEntry(session, nodeConstraintPairs)
         }
 
         println(entryNodePair)
@@ -74,6 +75,8 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
             assert(batchedNodes.all { it.second == null }) { "The pattern node already evaluated." }
 
             val nodeCandidate = patternNodeDict[patternId]?.let {
+                println(it)
+                println(nodeConstraintPair[patternId])
                 queryNodeWithConstraints(session, it, *nodeConstraintPair[patternId].orEmpty().toTypedArray()).toList()
             }
 //        if (nodeCandidate.isNullOrEmpty()) return emptyList()

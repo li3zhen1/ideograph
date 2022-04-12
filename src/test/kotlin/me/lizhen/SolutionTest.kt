@@ -11,9 +11,9 @@ import org.junit.Test
 
 
 class SolutionTest {
-    val mongoService = MongoService()
-    val dgraphService = DgraphService(mongoService)
-    val ctx = IdeographContext(mongoService, dgraphService)
+    val mongoService = MongoService(27026)
+//    val dgraphService = DgraphService(mongoService)
+    val ctx = IdeographContext(mongoService)
 
 
     val cp1 = CompositePattern(
@@ -269,45 +269,76 @@ class SolutionTest {
     /**
      * 报警人姓李或吴
      */
-    @Test
-    fun test1() {
-        val sol = runBlocking {
-            ctx.solveCompositePattern(cp1)
-        }
-        println(sol)
-    }
+//    @Test
+//    fun test1() {
+//        val sol = runBlocking {
+//            ctx.solveCompositePattern(cp1)
+//        }
+//        println(sol)
+//    }
 
 
     /**
      * 报警人 (姓李或吴) 且 (为小姐)
      */
-    @Test
-    fun test2() {
-        val sol = runBlocking {
-            ctx.solveCompositePattern(cp2)
-        }
-        println(sol)
-    }
+//    @Test
+//    fun test2() {
+//        val sol = runBlocking {
+//            ctx.solveCompositePattern(cp2)
+//        }
+//        println(sol)
+//    }
 
     /**
      * 报警人 (姓李 且 小姐) 或 (姓吴 且 先生)
      */
-    @Test
-    fun test3() {
-        val sol = runBlocking {
-            ctx.solveCompositePattern(cp3)
-        }
-        println(sol)
-    }
+//    @Test
+//    fun test3() {
+//        val sol = runBlocking {
+//            ctx.solveCompositePattern(cp3)
+//        }
+//        println(sol)
+//    }
 
 
     /**
      * 报警人 (姓李 且 小姐) and (姓吴 且 先生)
      */
+//    @Test
+//    fun flattenTest() {
+//        val sol = runBlocking {
+//            ctx.solveCompositePattern(flattenTest)
+//        }
+//        println(sol)
+//    }
+
+
+    val dsf = CompositePattern(
+        nodes = listOf(
+            PatternNode(
+                patternId = "dsf",
+                type = "人"
+            )
+        ),
+        edges = listOf(),
+        constraints = listOf(
+            PatternConstraint(
+                targetPatternId = "dsf",
+                targetType = PatternType.Node,
+                patternId = "name",
+                property = "姓名*",
+                operator = ComparisonOperator.MatchRegex,
+                value = "董淑.*"
+            )
+        ),
+        connections = null,
+        logicOperators = null,
+    )
+
     @Test
-    fun flattenTest() {
+    fun testDsf2() {
         val sol = runBlocking {
-            ctx.solveCompositePattern(flattenTest)
+            ctx.solveCompositePattern(dsf)
         }
         println(sol)
     }
