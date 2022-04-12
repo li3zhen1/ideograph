@@ -15,6 +15,7 @@ import me.lizhen.solvers.IdeographContext
 import me.lizhen.solvers.PatternSolutionResponse
 import me.lizhen.solvers.solveCompositePattern
 import me.lizhen.solvers.solvePatternBatched
+import me.lizhen.utils.measureElapsedTime
 
 
 fun main() {
@@ -33,25 +34,25 @@ fun main() {
 
             post("/solvePattern") {
                 val pattern = call.receive<Pattern>()
-//                val (result, time) = measureTimedValue {
-                val result = context.solvePatternBatched(pattern)
-//                }
+                val (time, result) = measureElapsedTime {
+                    context.solvePatternBatched(pattern)
+                }
 
                 call.respond(
                     PatternSolutionResponse(
-                        result, 0, null
+                        result, time, null
                     )
                 )
             }
 
             post("/solveCompositePattern") {
                 val pattern = call.receive<CompositePattern>()
-//                val (result, time) = measureTimedValue {
-                val result =   context.solveCompositePattern(pattern)
-//                }
+                val (time, result) = measureElapsedTime {
+                    context.solveCompositePattern(pattern)
+                }
                 call.respond(
                     PatternSolutionResponse(
-                        result, 0, null
+                        result, time, null
                     )
                 )
             }

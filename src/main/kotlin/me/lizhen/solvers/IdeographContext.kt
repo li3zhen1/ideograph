@@ -26,7 +26,7 @@ data class PatternSolution(
 @Serializable
 data class PatternSolutionResponse(
     val solutions: List<PatternSolution>,
-    val elapsedTimeInMillis: Long,
+    val elapsedTimeInMillis: Int,
     val message: String?
 )
 
