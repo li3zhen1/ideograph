@@ -2,11 +2,11 @@ package me.lizhen
 
 //import me.lizhen.algorithms.toBinaryArray
 import org.junit.Test
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
+//import kotlin.time.ExperimentalTime
+//import kotlin.time.measureTime
 
 class ExtensionTest {
-    @OptIn(ExperimentalTime::class)
+//    @OptIn(ExperimentalTime::class)
     @Test
     fun testBooleanArray() {
 

@@ -13,7 +13,7 @@ import me.lizhen.solvers.PatternSolution
 import me.lizhen.solvers.solvePatternBatched
 import me.lizhen.solvers.validate
 import org.litote.kmongo.json
-import kotlin.time.*
+//import kotlin.time.*
 
 class ApplicationTest {
 
@@ -102,16 +102,16 @@ class ApplicationTest {
 
     val break0328 = Json.decodeFromString<Pattern>("{\"nodes\":[{\"patternId\":\"YKQ7dAi9MoXVKFsYk6LGn\",\"type\":\"报警人\"},{\"patternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"type\":\"急救报警\"},{\"patternId\":\"CJXsc6VOBwA-pCXCEL0pk\",\"type\":\"受理人\"}],\"edges\":[{\"patternId\":\"iKzpaRzSQ31Huqw_Zzwa4\",\"fromPatternId\":\"YKQ7dAi9MoXVKFsYk6LGn\",\"toPatternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"type\":\"发起\"},{\"patternId\":\"a9dnXxdo47wVEWRNT2K4t\",\"fromPatternId\":\"CJXsc6VOBwA-pCXCEL0pk\",\"toPatternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"type\":\"受理\"}],\"constraints\":[{\"patternId\":\"fenKbcnNl5Thkpi0PcueK\",\"targetType\":\"Node\",\"targetPatternId\":\"CrJMwVx6hqpL9PYXjCGDl\",\"property\":\"流水号*\",\"operator\":\"MatchRegex\",\"value\":\"2019[0-9]+\"},{\"patternId\":\"Eqkd5n8Qmsjujus5RIIvx\",\"targetType\":\"Node\",\"targetPatternId\":\"YKQ7dAi9MoXVKFsYk6LGn\",\"property\":\"呼叫人*\",\"operator\":\"MatchRegex\",\"value\":\"李.+\"}]}")
 
-    @OptIn(ExperimentalTime::class)
+//    @OptIn(ExperimentalTime::class)
     private fun testPattern(pattern: Pattern): List<PatternSolution> {
         // WorkspaceNode::properties.keyProjection("呼叫人*") regex "李.+",
         // WorkspaceNode::properties.keyProjection("联系电话") regex "15[0-9]+",
 
-        var solutions: List<PatternSolution>
-        val time = measureTime {
-            solutions = runBlocking { ctx.solvePatternBatched(pattern) }
-        }
-        println("\n\n\n\n$time, ${solutions.size}")
+//        var solutions: List<PatternSolution>
+////        val time = measureTime {
+            val solutions = runBlocking { ctx.solvePatternBatched(pattern) }
+//        }
+//        println("\n\n\n\n$time, ${solutions.size}")
         return solutions
     }
 
