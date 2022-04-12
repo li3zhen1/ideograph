@@ -16,6 +16,7 @@ import me.lizhen.solvers.PatternSolutionResponse
 import me.lizhen.solvers.solveCompositePattern
 import me.lizhen.solvers.solvePatternBatched
 import me.lizhen.utils.measureElapsedTime
+import me.lizhen.utils.withTimeMeasure
 
 
 fun main() {
@@ -34,7 +35,7 @@ fun main() {
 
             post("/solvePattern") {
                 val pattern = call.receive<Pattern>()
-                val (time, result) = measureElapsedTime {
+                val (time, result) = withTimeMeasure {
                     context.solvePatternBatched(pattern)
                 }
 
@@ -47,7 +48,7 @@ fun main() {
 
             post("/solveCompositePattern") {
                 val pattern = call.receive<CompositePattern>()
-                val (time, result) = measureElapsedTime {
+                val (time, result) = withTimeMeasure {
                     context.solveCompositePattern(pattern)
                 }
                 call.respond(
