@@ -10,6 +10,7 @@ import me.lizhen.schema.PatternConstraint
 import me.lizhen.schema.PatternNode
 import toIndexedPair
 import toInvertedMap
+import kotlin.coroutines.coroutineContext
 
 suspend fun IdeographContext.getOptimizedEntry(
     clientSession: ClientSession,
@@ -20,10 +21,8 @@ suspend fun IdeographContext.getOptimizedEntry(
     val channel = Channel<Pair<Int, Long>>()
     nodeConstraintPairs.toIndexedPair().forEach {
         CoroutineScope(Dispatchers.IO).launch {
-//            produce {
-                val count = countConstrainedNodes(clientSession, it.second.first, *it.second.second.toTypedArray())
-                channel.send(Pair(it.first, count))
-//            }
+            val count = countConstrainedNodes(clientSession, it.second.first, *it.second.second.toTypedArray())
+            channel.send(Pair(it.first, count))
         }
     }
 
@@ -34,10 +33,11 @@ suspend fun IdeographContext.getOptimizedEntry(
 
         val thisEntryHasConstraints = nodeConstraintPairs[index].second.isNotEmpty()
         if (thisEntryHasConstraints || count<100) {
+            coroutineContext.cancelChildren()
             return pair
         }
     }
-
+    coroutineContext.cancelChildren()
     return collectedPairs.minByOrNull { it.value }!!.toPair()
 }
 
