@@ -2,6 +2,7 @@ package me.lizhen.solvers
 
 import com.mongodb.reactivestreams.client.ClientSession
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.selects.select
 import me.lizhen.schema.Pattern
@@ -9,6 +10,36 @@ import me.lizhen.schema.PatternConstraint
 import me.lizhen.schema.PatternNode
 import toIndexedPair
 import toInvertedMap
+
+suspend fun IdeographContext.getOptimizedEntry(
+    clientSession: ClientSession,
+    nodeConstraintPairs: List<Pair<PatternNode, List<PatternConstraint>>>
+): Pair<Int, Long> {
+    val collectedPairs: MutableMap<Int, Long> = mutableMapOf()
+
+    val channel = Channel<Pair<Int, Long>>()
+    nodeConstraintPairs.toIndexedPair().forEach {
+        CoroutineScope(Dispatchers.IO).launch {
+//            produce {
+                val count = countConstrainedNodes(clientSession, it.second.first, *it.second.second.toTypedArray())
+                channel.send(Pair(it.first, count))
+//            }
+        }
+    }
+
+    repeat(nodeConstraintPairs.size) {
+        val pair = channel.receive()
+        val (index, count) = pair
+        collectedPairs[index] = count
+
+        val thisEntryHasConstraints = nodeConstraintPairs[index].second.isNotEmpty()
+        if (thisEntryHasConstraints || count<100) {
+            return pair
+        }
+    }
+
+    return collectedPairs.minByOrNull { it.value }!!.toPair()
+}
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -21,7 +52,6 @@ fun IdeographContext.getBestEntry(
         val channels = nodeConstraintPairs.toIndexedPair().map {
             produce {
                 val count = countConstrainedNodes(clientSession, it.second.first, *it.second.second.toTypedArray())
-                delay(count*50)
                 send(Pair(it.first, count))
             }
         }
@@ -53,7 +83,7 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
         }
 
         val entryNodePair = runBlocking {
-            getBestEntry(session, nodeConstraintPairs)
+            getOptimizedEntry(session, nodeConstraintPairs)
         }
 
         println(entryNodePair)

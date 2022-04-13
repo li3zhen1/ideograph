@@ -11,7 +11,7 @@ import org.junit.Test
 
 
 class SolutionTest {
-    val mongoService = MongoService(27026)
+    val mongoService = MongoService()
 //    val dgraphService = DgraphService(mongoService)
     val ctx = IdeographContext(mongoService)
 
@@ -292,13 +292,16 @@ class SolutionTest {
     /**
      * 报警人 (姓李 且 小姐) 或 (姓吴 且 先生)
      */
-//    @Test
-//    fun test3() {
-//        val sol = runBlocking {
-//            ctx.solveCompositePattern(cp3)
-//        }
-//        println(sol)
-//    }
+    @Test
+    fun test3() {
+        val sol = runBlocking {
+            ctx.solveCompositePattern(cp3)
+        }
+        println(sol.size)
+        sol.forEach {
+            println(it.nodes.values.joinToString { n -> n.name })
+        }
+    }
 
 
     /**

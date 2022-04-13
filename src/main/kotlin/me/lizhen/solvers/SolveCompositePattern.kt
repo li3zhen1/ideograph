@@ -57,9 +57,7 @@ suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): L
         val solutions = mutableListOf<PatternSolution>()
         repeat(splitConstraints.size) {
             solutions += channel.receive()
-            print(solutions.size)
         }
-
         coroutineContext.cancelChildren()
         return solutions
 
