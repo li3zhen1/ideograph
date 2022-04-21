@@ -1,7 +1,5 @@
 package me.lizhen.algorithms
 
-import org.litote.kmongo.util.idValue
-
 open class DisjointSet<T, K : Comparable<K>>(
     private val nodes: Collection<T>,
     private val getId: T.() -> K

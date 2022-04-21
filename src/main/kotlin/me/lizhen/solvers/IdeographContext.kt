@@ -173,11 +173,15 @@ fun List<PatternConstraint>?.validate(workspaceNode: WorkspaceNode): Boolean {
 @Suppress("CANDIDATE_CHOSEN_USING_OVERLOAD_RESOLUTION_BY_LAMBDA_ANNOTATION")
 class IdeographContext(
     val mongoService: MongoService,
+    asyncInitialize: Boolean = true
 //    val dgraphService: DgraphService
 ) {
     init {
-        initializeSchema()
+        if (asyncInitialize)
+            initializeSchemaAsync()
+        else initializeSchema()
     }
+
 
     lateinit var conceptNodes: List<ConceptNode>
     lateinit var conceptTypeDict: Map<String?, ConceptNode>

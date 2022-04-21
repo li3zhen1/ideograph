@@ -5,23 +5,23 @@ import kotlinx.serialization.Serializable
 import me.lizhen.algorithms.ConstraintContext
 import me.lizhen.algorithms.LogicOperator
 
-interface IdentifiablePattern {
+public interface IdentifiablePattern {
     val patternId: String
 }
 
 @Serializable
-data class PatternNode(
+public data class PatternNode(
     override val patternId: String,
     val type: String
-): IdentifiablePattern
+) : IdentifiablePattern
 
 @Serializable
-enum class PatternType(val value: Int) {
+public enum class PatternType(val value: Int) {
     Node(0), Edge(1), Constraint(2)
 }
 
 @Serializable
-enum class ComparisonOperator(val value: Int) {
+public enum class ComparisonOperator(val value: Int) {
     Equal(0), NotEqual(1),
     Greater(2), GreaterOrEqual(3), Less(4), LessOrEqual(5),
     MatchRegex(6)
@@ -29,7 +29,7 @@ enum class ComparisonOperator(val value: Int) {
 
 
 @Serializable
-data class PatternConstraint(
+public data class PatternConstraint(
     override val patternId: String,
     val targetType: PatternType,
     val targetPatternId: String,
@@ -37,45 +37,129 @@ data class PatternConstraint(
     val property: String,
     val operator: ComparisonOperator,
     val value: String
-): IdentifiablePattern
+) : IdentifiablePattern
 
 
 @Serializable
-data class PatternEdge(
+public data class PatternEdge(
     override val patternId: String,
 
     val type: String,
 
     val fromPatternId: String,
     val toPatternId: String,
-): IdentifiablePattern
+) : IdentifiablePattern
 
 
 @Serializable
-data class Pattern(
+public data class Pattern(
     val nodes: List<PatternNode>,
     val edges: List<PatternEdge>?,
     val constraints: List<PatternConstraint>?
 )
 
 @Serializable
-data class PatternLogicOperator(
+public data class PatternLogicOperator(
     override val patternId: String,
     val type: LogicOperator
 ) : IdentifiablePattern
 
 @Serializable
-data class ConstraintConnection(
+public data class ConstraintConnection(
     val from: String,
     val to: String
 )
 
 @Serializable
-data class CompositePattern(
+public data class CompositePattern(
     val nodes: List<PatternNode>,
     val edges: List<PatternEdge>?,
     val constraints: List<PatternConstraint>?,
 
     val logicOperators: List<PatternLogicOperator>?,
     val connections: List<ConstraintConnection>?
-)
+) {
+
+    inline fun nodes(nodeBuilder: CompositePattern.() -> Unit) {
+
+    }
+
+    inline fun edges(edgeBuilder: CompositePattern.() -> Unit) {
+
+    }
+
+    inline fun constraint(constraintBuilder: CompositePattern.() -> Unit) {
+
+    }
+
+    infix fun String.to(patternId: String): PatternEdge {
+        return PatternEdge(
+            fromPatternId = this,
+            toPatternId = patternId,
+            patternId = "",
+            type = "PatternType.Node",
+        )
+    }
+
+    companion object {
+
+
+        operator fun invoke(contextualBuilder: CompositePattern.() -> Unit) {
+
+        }
+    }
+}
+
+//
+//
+//public class CompositePatternBuildContext {
+//    var nodes: MutableList<PatternNode> = mutableListOf()
+//    var edges: MutableList<PatternEdge> = mutableListOf()
+//
+//    constructor(builder: CompositePatternBuildContext.() -> Unit) {
+//
+//    }
+//
+//    infix fun String.to(patternId: String): PatternEdge {
+//        return PatternEdge(
+//            fromPatternId = this,
+//            toPatternId = patternId,
+//            patternId = "",
+//            type = "PatternType.Node",
+//        )
+//    }
+//
+//    infix fun String.concept(patternId: String): PatternEdge {
+//        return PatternEdge(
+//            fromPatternId = this,
+//            toPatternId = patternId,
+//            patternId = "",
+//            type = "PatternType.Node",
+//        )
+//    }
+//
+//    fun build(): CompositePattern {
+//        return CompositePattern(
+//            nodes,
+//            edges,
+//            null,
+//            null,
+//            null,
+//        )
+//    }
+//}
+//
+//
+//fun pattern(contextualBuilder: CompositePatternBuildContext.() -> Unit): CompositePattern {
+//    return CompositePatternBuildContext(contextualBuilder).build()
+//}
+//
+//
+//val c = pattern {
+//    "Amy" concept "People"
+//    "Ben" concept "People"
+//    "Dylon" concept "People"
+//
+//    "Amy" to "Ben"
+//    "Amy" to "Dylon"
+//}

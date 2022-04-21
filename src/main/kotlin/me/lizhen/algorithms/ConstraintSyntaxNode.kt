@@ -5,7 +5,7 @@ import me.lizhen.schema.PatternConstraint
 import me.lizhen.schema.PatternLogicOperator
 import kotlin.math.pow
 
-enum class LogicOperator(val value: Int) {
+public enum class LogicOperator(val value: Int) {
     And(0), Or(1), Not(2), Xor(3), Xnor(4)
 }
 

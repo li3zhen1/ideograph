@@ -8,6 +8,8 @@ import me.lizhen.schema.Pattern
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.selects.select
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -15,8 +17,20 @@ import kotlin.coroutines.coroutineContext
  */
 const val maxCoroutineChannels = 64
 
+public suspend fun IdeographContext.solveCompositePatternFromJsonString(patternString: String): List<PatternSolution> {
+    val jsonObject = Json.decodeFromString<CompositePattern>(patternString)
+    return solveCompositePattern(jsonObject)
+}
+
+public fun IdeographContext.solveCompositePatternFromJsonStringBlocked(patternString: String): List<PatternSolution>
+    = runBlocking {
+        val jsonObject = Json.decodeFromString<CompositePattern>(patternString)
+        solveCompositePattern(jsonObject)
+    }
+
+
 @OptIn(ExperimentalCoroutinesApi::class)
-suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): List<PatternSolution> {
+public suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): List<PatternSolution> {
     println("=========== new session ==========")
     println(pattern.nodes.size)
     println(pattern.edges?.size)

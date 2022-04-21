@@ -1,6 +1,8 @@
 package me.lizhen
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import me.lizhen.algorithms.LogicOperator
 import me.lizhen.schema.*
 import me.lizhen.service.DgraphService
@@ -340,8 +342,73 @@ class SolutionTest {
 
     @Test
     fun testDsf2() {
+        val js = Json.decodeFromString<CompositePattern>("{\n" +
+                "    \"nodes\": [\n" +
+                "        {\n" +
+                "            \"patternId\": \"jhFec_O3fOiOJ4sn8Oare\",\n" +
+                "            \"type\": \"企业\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"7iY9ejCrA3FeGWwngOk5C\",\n" +
+                "            \"type\": \"股东\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"REbWXCWCNvn52K6FW7tyb\",\n" +
+                "            \"type\": \"人\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"D6jgotz5kMZiGHX4EN4or\",\n" +
+                "            \"type\": \"股东\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"xn8JuS3utkxnf71k9NkF5\",\n" +
+                "            \"type\": \"人\"\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"edges\": [\n" +
+                "        {\n" +
+                "            \"patternId\": \"PVSpKlWvDc9xzWgK94zBh\",\n" +
+                "            \"fromPatternId\": \"REbWXCWCNvn52K6FW7tyb\",\n" +
+                "            \"toPatternId\": \"7iY9ejCrA3FeGWwngOk5C\",\n" +
+                "            \"type\": \"参与股东\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"pHZ6Z-ISO4KP8p2fgbq_u\",\n" +
+                "            \"fromPatternId\": \"7iY9ejCrA3FeGWwngOk5C\",\n" +
+                "            \"toPatternId\": \"jhFec_O3fOiOJ4sn8Oare\",\n" +
+                "            \"type\": \"被投企业\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"YM-pW7yNJNn783NKB8zsh\",\n" +
+                "            \"fromPatternId\": \"D6jgotz5kMZiGHX4EN4or\",\n" +
+                "            \"toPatternId\": \"jhFec_O3fOiOJ4sn8Oare\",\n" +
+                "            \"type\": \"被投企业\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"4tDRO9SvR-0zrKaaESM5L\",\n" +
+                "            \"fromPatternId\": \"xn8JuS3utkxnf71k9NkF5\",\n" +
+                "            \"toPatternId\": \"D6jgotz5kMZiGHX4EN4or\",\n" +
+                "            \"type\": \"参与股东\"\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"constraints\": [\n" +
+                "        {\n" +
+                "            \"patternId\": \"O2g6rnREzMf9bxKv5oEep\",\n" +
+                "            \"targetType\": \"Node\",\n" +
+                "            \"targetPatternId\": \"REbWXCWCNvn52K6FW7tyb\",\n" +
+                "            \"property\": \"姓名*\",\n" +
+                "            \"operator\": \"MatchRegex\",\n" +
+                "            \"value\": \"董淑.+\"\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"logicOperators\": [],\n" +
+                "    \"connections\": []\n" +
+                "}")
+
         val sol = runBlocking {
-            ctx.solveCompositePattern(dsf)
+            ctx.solveCompositePattern(
+                js
+            )
         }
         println(sol)
     }
