@@ -4,6 +4,7 @@ import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 import me.lizhen.algorithms.ConstraintContext
 import me.lizhen.algorithms.LogicOperator
+import me.lizhen.solvers.PatternSolution
 
 public interface IdentifiablePattern {
     val patternId: String
@@ -163,3 +164,20 @@ public data class CompositePattern(
 //    "Amy" to "Ben"
 //    "Amy" to "Dylon"
 //}
+
+
+fun PatternSolution.uniqKey(): String = nodes.toList().joinToString("") {
+    it.second.nodeId.toString()
+} + edges.toList().joinToString("") {
+    it.second.edgeId.toString()
+}
+
+/**
+ * assuming is paired
+ */
+fun List<PatternConstraint>?.validate(workspaceNode: WorkspaceNode): Boolean {
+    if (this == null) return true
+    return this.all {
+        workspaceNode.properties[it.property].orEmpty().matches(Regex(it.value))
+    }
+}

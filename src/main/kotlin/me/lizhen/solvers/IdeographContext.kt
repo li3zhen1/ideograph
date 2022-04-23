@@ -1,8 +1,10 @@
 package me.lizhen.solvers
 
 import com.mongodb.reactivestreams.client.ClientSession
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import me.lizhen.schema.*
 import me.lizhen.service.*
 import org.litote.kmongo.*
@@ -144,29 +146,6 @@ data class PatternSolutionUnderEvaluation(
 
     inline fun uniqKey(): String = nodes.joinToString { it.second?.nodeId.toString() }
 
-
-    companion object {
-//        const val EDGE_EVALUATED = -1
-//        const val EDGE_FROM_EVALUABLE = 0
-//        const val EDGE_TO_EVALUABLE = 1
-    }
-}
-
-
-fun PatternSolution.uniqKey(): String = nodes.toList().joinToString("") {
-    it.second.nodeId.toString()
-} + edges.toList().joinToString("") {
-    it.second.edgeId.toString()
-}
-
-/**
- * assuming is paired
- */
-fun List<PatternConstraint>?.validate(workspaceNode: WorkspaceNode): Boolean {
-    if (this == null) return true
-    return this.all {
-        workspaceNode.properties[it.property].orEmpty().matches(Regex(it.value))
-    }
 }
 
 
@@ -585,12 +564,12 @@ class IdeographContext(
             .batchSize(BATCH_SIZE)
     }
 
-    @Deprecated("use evaluateNodes")
+//    @Deprecated("use evaluateNodes")
     fun getEdgeTypeCandidates(from: PatternNode, to: PatternNode) = hasRelationConceptEdges.filter {
         it.fromId == from.getConceptId() && it.toId == to.getConceptId()
     }
 
-    @Deprecated("use evaluateNodes")
+//    @Deprecated("use evaluateNodes")
     suspend fun getConnectedNodeCandidates(
         from: PatternNode,
         to: PatternNode,
@@ -614,7 +593,7 @@ class IdeographContext(
     }
 
 
-    @Deprecated("use evaluateNodes")
+//    @Deprecated("use evaluateNodes")
     suspend fun getNodePairsByEdge(edges: List<WorkspaceEdge>): List<WorkspaceNode> {
         val groupedEdges = edges.groupBy { it.relationId }.mapKeys { relationConceptDict[it.key]?.name }
 
@@ -632,6 +611,20 @@ class IdeographContext(
     private fun PatternNode.getConceptId() = conceptTypeDict[this.type]?.nodeId
 
     val schema get() = IdeographSchema(conceptNodes, propertyNodes, hasPropertyEdges, hasRelationConceptEdges)
+
+
+    @JvmName("solveCompositePatternFromStringAsync")
+    public suspend fun solveCompositePatternFromJsonString(patternString: String): List<PatternSolution> {
+        val jsonObject = Json.decodeFromString<CompositePattern>(patternString)
+        return solveCompositePattern(jsonObject)
+    }
+
+    @JvmName("solveCompositePatternFromString")
+    public fun solveCompositePatternFromJsonStringBlocked(patternString: String): List<PatternSolution>
+            = runBlocking {
+        val jsonObject = Json.decodeFromString<CompositePattern>(patternString)
+        solveCompositePattern(jsonObject)
+    }
 
     companion object {
         const val MONGO_NODE_LIMIT = 10000

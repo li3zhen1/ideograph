@@ -17,16 +17,10 @@ import kotlin.coroutines.coroutineContext
  */
 const val maxCoroutineChannels = 64
 
-public suspend fun IdeographContext.solveCompositePatternFromJsonString(patternString: String): List<PatternSolution> {
-    val jsonObject = Json.decodeFromString<CompositePattern>(patternString)
-    return solveCompositePattern(jsonObject)
-}
 
-public fun IdeographContext.solveCompositePatternFromJsonStringBlocked(patternString: String): List<PatternSolution>
-    = runBlocking {
-        val jsonObject = Json.decodeFromString<CompositePattern>(patternString)
-        solveCompositePattern(jsonObject)
-    }
+
+
+
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -86,5 +80,3 @@ public suspend fun IdeographContext.solveCompositePattern(pattern: CompositePatt
         )
     }
 }
-
-

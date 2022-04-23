@@ -5,7 +5,6 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.lizhen.algorithms.LogicOperator
 import me.lizhen.schema.*
-import me.lizhen.service.DgraphService
 import me.lizhen.service.MongoService
 import me.lizhen.solvers.IdeographContext
 import me.lizhen.solvers.solveCompositePattern

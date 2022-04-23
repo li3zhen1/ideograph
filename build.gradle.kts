@@ -5,8 +5,8 @@ val logbackVersion = "1.2.3"
 plugins {
 
     application
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.20"
 
     `java-library`
 }

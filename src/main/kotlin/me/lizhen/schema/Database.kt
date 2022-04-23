@@ -1,10 +1,6 @@
 package me.lizhen.schema
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-@Serializable
-class ObjectId(@SerialName("\$oid") val oid: String)
 
 @Serializable
 class Evidences
@@ -12,21 +8,12 @@ class Evidences
 @Serializable
 data class RelationNode(
     val _id: String,
-//    val _class: String,
-//    val evidences: Evidences,
     val judgeParent: Boolean,
     val name: String,
     val nodeId: Long,
     val nodeLabel: String,
     val parent: Long,
     val tagScore: Evidences,
-//    val trustedAccessibility: Long,
-//    val trustedCorrectness: Long,
-//    val trustedLevel: Long,
-//    val trustedReliability: Long,
-//    val trustedSafety: Long,
-//    val trustedTimeliness: Long,
-//    val trustedValue: Long,
     val types: String
 )
 
@@ -34,7 +21,6 @@ data class RelationNode(
 @Serializable
 data class HasRelationConceptEdge(
     val _id: String,
-//    val _class: String,
     val fromId: Long,
     val toId: Long,
     val edgeId: Long,
@@ -100,17 +86,16 @@ data class WorkspaceNode(
             return nodeId == other.nodeId
         return false
     }
+
+    override fun hashCode() = _id.hashCode()
 }
 
 
 @Serializable
 data class WorkspaceEdge(
     val _id: String,
-//    val _class: String,
-//    val clusterId: Long,
     val edgeId: Long,
     val edgeLabel: String,
-//    val evidences: Evidences,
     val fromId: Long,
     val name: String,
     val properties: Evidences,
@@ -133,4 +118,6 @@ data class WorkspaceEdge(
                     )
         return false
     }
+
+    override fun hashCode() = _id.hashCode()
 }
