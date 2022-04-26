@@ -4,7 +4,7 @@ package me.lizhen.algorithms
 
 /**
  * A data class maintaining a char array with `equals` override like `String`
- * TODO: change to value class in the future version.
+ * TODO: change to value class in the future Kotlin.
  */
 data class Term(
     val chars: CharArray

@@ -7,7 +7,7 @@ open class DisjointSet<T, K : Comparable<K>>(
     protected val parentMap = nodes.associateBy(getId).toMutableMap()
     protected val rankMap = nodes.associate { it.getId() to 0 }.toMutableMap()
     public val sizeMap = nodes.associate { it.getId() to 1 }.toMutableMap()
-    protected val nodeMap = nodes.associateBy(getId)
+    private val nodeMap = nodes.associateBy(getId)
     public var rootCount: Int = nodes.count()
 
     protected fun findSet(item: T): T {

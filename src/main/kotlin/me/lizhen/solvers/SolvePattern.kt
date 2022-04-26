@@ -343,9 +343,8 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
         }
 
 
-
         return solutionPool
-            .distinctBy { it.uniqKey() }
+            .distinctBy { it.uniqKey() /* redundant */ }
             .mapNotNull { it.completed() }
             .also { session.close() }
     }

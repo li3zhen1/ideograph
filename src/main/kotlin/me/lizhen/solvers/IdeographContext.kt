@@ -524,6 +524,6 @@ class IdeographContext(
     companion object {
         const val MONGO_NODE_LIMIT = 10000
         const val EVALUABLE_CANDIDATE_LIMIT = 1000
-        const val BATCH_SIZE = 100
+        const val BATCH_SIZE = 50
     }
 }

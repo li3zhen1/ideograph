@@ -20,7 +20,7 @@ class QuineMcCluskey(
         )
     }
 
-    fun simplify(
+    private fun simplify(
         ones: Set<Term>,
         dontCares: Set<Term> = setOf(),
         numBits: Int? = null,
