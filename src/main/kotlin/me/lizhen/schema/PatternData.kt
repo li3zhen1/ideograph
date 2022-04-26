@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import me.lizhen.algorithms.ConstraintContext
 import me.lizhen.algorithms.LogicOperator
 import me.lizhen.solvers.PatternSolution
+import org.bson.conversions.Bson
 
 public interface IdentifiablePattern {
     val patternId: String

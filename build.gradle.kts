@@ -42,8 +42,7 @@ application {
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-    
-    
+
 }
 
 repositories {
@@ -51,12 +50,9 @@ repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
 }
 
-
-
 dependencies {
-//    implementation("org.litote.kmongo:kmongo:4.5.0")
     implementation("org.litote.kmongo:kmongo-coroutine:4.5.0")
-    implementation("io.dgraph:dgraph4j:21.12.0")
+//    implementation("io.dgraph:dgraph4j:21.12.0")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")

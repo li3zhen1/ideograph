@@ -6,7 +6,6 @@ import io.ktor.server.netty.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import me.lizhen.service.DgraphService
 import me.lizhen.plugins.*
 import me.lizhen.schema.CompositePattern
 import me.lizhen.schema.Pattern

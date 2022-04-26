@@ -2,12 +2,9 @@ package me.lizhen.solvers
 
 import com.mongodb.reactivestreams.client.ClientSession
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.selects.select
-import me.lizhen.schema.Pattern
-import me.lizhen.schema.PatternConstraint
-import me.lizhen.schema.PatternNode
+import me.lizhen.schema.*
 import toIndexedPair
 import toInvertedMap
 import kotlin.coroutines.coroutineContext

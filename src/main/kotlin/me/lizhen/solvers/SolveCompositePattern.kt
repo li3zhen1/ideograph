@@ -17,12 +17,6 @@ import kotlin.coroutines.coroutineContext
  */
 const val maxCoroutineChannels = 64
 
-
-
-
-
-
-
 @OptIn(ExperimentalCoroutinesApi::class)
 public suspend fun IdeographContext.solveCompositePattern(pattern: CompositePattern): List<PatternSolution> {
     println("=========== new session ==========")
