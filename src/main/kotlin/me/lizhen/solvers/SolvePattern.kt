@@ -312,7 +312,7 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
                     }
 
                     ?: evaluatedNodeIndices
-                        .flatMap { nodeAsFromIndices[it] }
+                        .flatMap { nodeAsToIndices[it] }
                         .firstOrNull { edgeIndex ->
                             !edgeEvaluatedFlags[edgeIndex]
                         }
