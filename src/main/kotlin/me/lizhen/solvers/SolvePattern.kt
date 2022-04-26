@@ -9,6 +9,9 @@ import toIndexedPair
 import toInvertedMap
 import kotlin.coroutines.coroutineContext
 
+/**
+ * find the node that has minimum candidates (or < 100)
+ */
 suspend fun IdeographContext.getOptimizedEntry(
     clientSession: ClientSession,
     nodeConstraintPairs: List<Pair<PatternNode, List<PatternConstraint>>>
@@ -38,7 +41,7 @@ suspend fun IdeographContext.getOptimizedEntry(
     return collectedPairs.minByOrNull { it.value }!!.toPair()
 }
 
-
+@Deprecated("Use getOptimized entry")
 @OptIn(ExperimentalCoroutinesApi::class)
 fun IdeographContext.getBestEntry(
     clientSession: ClientSession,
@@ -60,7 +63,9 @@ fun IdeographContext.getBestEntry(
     }
 }
 
-
+/**
+ * Solve Pattern, taking all logic operators as ALL
+ */
 suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<PatternSolution> =
     mongoService.startSession().use { session ->
         println(pattern)
@@ -117,6 +122,11 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
             }
         }
 
+        /**
+         * evaluate 1 pattern edge batched
+         * 1 query
+         * @param solutionsToSolve batched
+         */
         suspend fun evaluatePatternEdge(
             solutionsToSolve: List<PatternSolutionUnderEvaluation>,
             patternEdgeIndex: Int,
@@ -337,78 +347,5 @@ suspend fun IdeographContext.solvePatternBatched(pattern: Pattern): List<Pattern
         return solutionPool
             .distinctBy { it.uniqKey() }
             .mapNotNull { it.completed() }
-//            .also {
-//                it[0].edges.toList().forEachIndexed { i, e ->
-//                    println("$i   ${e.second}\n   -   ${it[1].edges.toList()[i].second}\n\n\n")
-//                }
-//            }
             .also { session.close() }
     }
-
-//        patternNodeQueues.forEach { entry ->
-//            val patternNode = patternNodeDict[entry.key]
-//            val targetingConstraints = nodeConstraintPair[entry.key]
-//
-//            if (entry.value <= EVALUABLE_CANDIDATE_LIMIT) {
-//
-//            }
-//        }
-//
-//
-//        val nodeCandidateLists = nodeConstraintPair.mapValues {
-//            patternNodeDict[it.key]?.let { n ->
-//                queryNodeWithConstraints(n, *it.value.toTypedArray())
-//            }
-//        }
-//
-//        nodeCandidateLists.forEach {
-//            println(it.value?.size)
-//        }
-//
-//        val nodesPool = nodeCandidateLists.flatMap { it.value.orEmpty() }.associateBy { it.nodeId }
-//
-//        /**
-//         * assuming only one
-//         */
-//        val edgeCandidateLists = pattern.edges?.map { pe ->
-//            val fromCandidates = nodeCandidateLists[pe.fromPatternId]
-//            val toCandidates = nodeCandidateLists[pe.toPatternId]
-//            if (fromCandidates.isNullOrEmpty() || toCandidates.isNullOrEmpty())
-//                return@map emptyList()
-//
-//            val edgeTypeCandidates = patternNodeDict[pe.fromPatternId]?.let { from ->
-//                patternNodeDict[pe.toPatternId]?.let { to ->
-//                    getEdgeTypeCandidates(from, to)
-//                }
-//            }
-//
-//            println(edgeTypeCandidates?.map { it.name })
-//
-//            edgeTypeCandidates?.flatMap {
-//                if (toCandidates.size >= MONGO_NODE_LIMIT) {
-//                    return@flatMap queryEdges(it.name, fromCandidates)
-//                } else {
-//
-//                    return@flatMap queryEdges(it.name, fromCandidates, toCandidates)
-//                }
-//            }.orEmpty()
-//        }
-//
-//        if (edgeCandidateLists?.size != 1) {
-//            return emptyList()
-//        }
-//
-//
-//        val solutions = edgeCandidateLists[0].mapNotNull { edge ->
-//            val fromNode = nodesPool[edge.fromId]
-//            val toNode = nodesPool[edge.toId]
-//            if (fromNode == null || toNode == null) return@mapNotNull null
-//            PatternSolution(
-//                nodes = listOf(fromNode, toNode),
-//                edges = listOf(edge)
-//            )
-//        }
-//
-//        return solutions
-
-
