@@ -98,7 +98,7 @@ data class WorkspaceEdge(
     val edgeLabel: String,
     val fromId: Long,
     val name: String,
-    val properties: Evidences,
+    val properties: Map<String, String>,
     val relationId: Long,
     val source: String,
     val tagScore: Evidences,

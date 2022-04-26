@@ -7,6 +7,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.lizhen.schema.*
 import me.lizhen.service.*
+import org.bson.conversions.Bson
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.*
 
@@ -33,7 +34,6 @@ data class PatternSolutionResponse(
 )
 
 fun PatternSolution.validate(pattern: Pattern): Boolean {
-
     return nodes.all { (pid, wn) ->
 
         val pn = pattern.nodes.find {
@@ -43,12 +43,42 @@ fun PatternSolution.validate(pattern: Pattern): Boolean {
         val constraints = pattern.constraints?.filter {
             it.targetPatternId == pn.patternId
         }!!
-        if(constraints.isEmpty()) return true;
+        if (constraints.isEmpty())
+            return true;
 
         return@all constraints.validate(wn)
     }
-
 }
+
+fun PatternConstraint.filterOnNode(): Bson {
+    val rawFilters = when (operator) {
+        ComparisonOperator.Equal -> WorkspaceNode::properties.keyProjection(property) eq value
+        ComparisonOperator.MatchRegex -> WorkspaceNode::properties.keyProjection(property) regex value
+        ComparisonOperator.NotEqual -> WorkspaceNode::properties.keyProjection(property) ne value
+        ComparisonOperator.Greater -> WorkspaceNode::properties.keyProjection(property) gt value
+        ComparisonOperator.GreaterOrEqual -> WorkspaceNode::properties.keyProjection(property) gte value
+        ComparisonOperator.Less -> WorkspaceNode::properties.keyProjection(property) lt value
+        ComparisonOperator.LessOrEqual -> WorkspaceNode::properties.keyProjection(property) lte value
+    }
+    return if (isReversed) not(rawFilters) else rawFilters
+}
+
+fun PatternConstraint.filterOnEdge(): Bson {
+    val rawFilters = when (operator) {
+        ComparisonOperator.Equal -> WorkspaceEdge::properties.keyProjection(property) eq value
+        ComparisonOperator.MatchRegex -> WorkspaceEdge::properties.keyProjection(property) regex value
+        ComparisonOperator.NotEqual -> WorkspaceEdge::properties.keyProjection(property) ne value
+        ComparisonOperator.Greater -> WorkspaceEdge::properties.keyProjection(property) gt value
+        ComparisonOperator.GreaterOrEqual -> WorkspaceEdge::properties.keyProjection(property) gte value
+        ComparisonOperator.Less -> WorkspaceEdge::properties.keyProjection(property) lt value
+        ComparisonOperator.LessOrEqual -> WorkspaceEdge::properties.keyProjection(property) lte value
+    }
+    return if (isReversed) not(rawFilters) else rawFilters
+}
+
+fun Array<out PatternConstraint>.asBsonOnNode() = and(map { it.filterOnNode() })
+fun List<PatternConstraint>.asBsonOnNode() = and(map { it.filterOnNode() })
+fun List<PatternConstraint>.asBsonOnEdge() = and(map { it.filterOnEdge() })
 
 /**
  * null:
@@ -139,7 +169,7 @@ data class PatternSolutionUnderEvaluation(
                 nodes.associate { it.first to it.second!! },
                 edges.associate { it.first to it.second!! },
             )
-                //.also { println(it) }
+            //.also { println(it) }
         }
         return null
     }
@@ -311,16 +341,10 @@ class IdeographContext(
         return solutionPool.mapNotNull { it.completed() }
     }
 
-    suspend fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
+    private suspend fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
         return mongoService
             .getCollection<WorkspaceNode>(node.type + "_node")
-            .countDocuments(
-                and(
-                    constraints.map {
-                        WorkspaceNode::properties.keyProjection(it.property) regex it.value
-                    }
-                )
-            )
+            .countDocuments(constraints.asBsonOnNode())
     }
 
     suspend fun countConstrainedNodes(
@@ -331,11 +355,7 @@ class IdeographContext(
         .getCollection<WorkspaceNode>(node.type + "_node")
         .countDocuments(
             clientSession = session,
-            filter = and(
-                constraints.map {
-                    WorkspaceNode::properties.keyProjection(it.property) regex it.value
-                }
-            )
+            filter = constraints.asBsonOnNode()
         )
 
     suspend fun queryNodeWithConstraints(
@@ -346,13 +366,7 @@ class IdeographContext(
         // WorkspaceNode::properties.keyProjection("联系电话") regex "1569755338[0-9]+",
         val find = mongoService
             .getCollection<WorkspaceNode>(node.type + "_node")
-            .find(
-                and(
-                    constraints.map {
-                        WorkspaceNode::properties.keyProjection(it.property) regex it.value
-                    }
-                )
-            )
+            .find(constraints.asBsonOnNode())
             .batchSize(BATCH_SIZE)
 //        if (find.count() > MONGO_NODE_LIMIT) throw Error("Query maximum exceeded.")
         return find.toList()
@@ -367,14 +381,10 @@ class IdeographContext(
         .getCollection<WorkspaceNode>(node.type + "_node")
         .find(
             session,
-            and(
-                constraints.map {
-                    WorkspaceNode::properties.keyProjection(it.property) regex it.value
-                }
-            )
+            constraints.asBsonOnNode()
         )
         .batchSize(BATCH_SIZE)
-    
+
 
     suspend fun queryNodeWithConstraints(
         nodeTypeName: String,
@@ -385,11 +395,7 @@ class IdeographContext(
             .getCollection<WorkspaceNode>(nodeTypeName + "_node")
             .find(
                 WorkspaceNode::nodeId `in` nodeIds,
-                and(
-                    constraints.map {
-                        WorkspaceNode::properties.keyProjection(it.property) regex it.value
-                    }
-                )
+                constraints.asBsonOnNode()
             )
             .batchSize(BATCH_SIZE)
 //        if (find.count() > MONGO_NODE_LIMIT) throw Error("Query maximum exceeded.")
@@ -408,7 +414,7 @@ class IdeographContext(
             clientSession,
             and(
                 constraints.map {
-                    WorkspaceNode::properties.keyProjection(it.property) regex it.value
+                    it.filterOnNode()
                 } + (WorkspaceNode::nodeId `in` nodeIds) //+ additionalConstraints
             )
         )
@@ -498,51 +504,6 @@ class IdeographContext(
 
             .batchSize(BATCH_SIZE)
     }
-
-//    @Deprecated("use evaluateNodes")
-    fun getEdgeTypeCandidates(from: PatternNode, to: PatternNode) = hasRelationConceptEdges.filter {
-        it.fromId == from.getConceptId() && it.toId == to.getConceptId()
-    }
-
-//    @Deprecated("use evaluateNodes")
-    suspend fun getConnectedNodeCandidates(
-        from: PatternNode,
-        to: PatternNode,
-        fromNodes: List<WorkspaceNode>,
-        vararg toConstraints: List<PatternConstraint>
-    ): List<WorkspaceEdge> {
-        val acceptableRelationTypes = hasRelationConceptEdges.filter {
-            it.fromId == from.getConceptId() && it.toId == to.getConceptId()
-        }
-        if (acceptableRelationTypes.isEmpty()) throw Error("No acceptable relations.")
-        val acceptableFromId = fromNodes.map { it.nodeId }.toList()
-        val toNodes = acceptableRelationTypes.flatMap {
-            mongoService
-                .getCollection<WorkspaceEdge>(it.name + "_edge")
-                .find(WorkspaceEdge::fromId `in` acceptableFromId)
-                .batchSize(BATCH_SIZE)
-                .limit(MONGO_NODE_LIMIT)
-                .toList()
-        }
-        return toNodes
-    }
-
-
-//    @Deprecated("use evaluateNodes")
-    suspend fun getNodePairsByEdge(edges: List<WorkspaceEdge>): List<WorkspaceNode> {
-        val groupedEdges = edges.groupBy { it.relationId }.mapKeys { relationConceptDict[it.key]?.name }
-
-        val collection: List<WorkspaceNode> = groupedEdges.flatMap {
-            if (it.key.isNullOrEmpty()) return listOf()
-            return mongoService.getCollection<WorkspaceNode>(it.key + "_node")
-                .find()
-                .batchSize(BATCH_SIZE)
-                .toList()
-        }
-        return collection
-    }
-
-
     private fun PatternNode.getConceptId() = conceptTypeDict[this.type]?.nodeId
 
     val schema get() = IdeographSchema(conceptNodes, propertyNodes, hasPropertyEdges, hasRelationConceptEdges)
@@ -555,8 +516,7 @@ class IdeographContext(
     }
 
     @JvmName("solveCompositePatternFromString")
-    public fun solveCompositePatternFromJsonStringBlocked(patternString: String): List<PatternSolution>
-            = runBlocking {
+    public fun solveCompositePatternFromJsonStringBlocked(patternString: String): List<PatternSolution> = runBlocking {
         val jsonObject = Json.decodeFromString<CompositePattern>(patternString)
         solveCompositePattern(jsonObject)
     }

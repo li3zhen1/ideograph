@@ -8,11 +8,12 @@ import me.lizhen.schema.*
 import me.lizhen.service.MongoService
 import me.lizhen.solvers.IdeographContext
 import me.lizhen.solvers.solveCompositePattern
+import me.lizhen.solvers.validate
 import org.junit.Test
 
 
 class SolutionTest {
-    val mongoService = MongoService()
+    val mongoService = MongoService(27026)
 //    val dgraphService = DgraphService(mongoService)
     val ctx = IdeographContext(mongoService)
 
@@ -320,8 +321,24 @@ class SolutionTest {
     val dsf = CompositePattern(
         nodes = listOf(
             PatternNode(
+                patternId = "comp1",
+                type = "企业"
+            ),
+            PatternNode(
+                patternId = "holder1",
+                type = "股东"
+            ),
+            PatternNode(
                 patternId = "dsf",
                 type = "人"
+            ),
+            PatternNode(
+                patternId = "holder2",
+                type = "人"
+            ),
+            PatternNode(
+                patternId = "comp2",
+                type = "企业"
             )
         ),
         edges = listOf(),
@@ -398,6 +415,14 @@ class SolutionTest {
                 "            \"property\": \"姓名*\",\n" +
                 "            \"operator\": \"MatchRegex\",\n" +
                 "            \"value\": \"董淑.+\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"patternId\": \"O2g6rnREzMf9bEep\",\n" +
+                "            \"targetType\": \"Node\",\n" +
+                "            \"targetPatternId\": \"D6jgotz5kMZiGHX4EN4or\",\n" +
+                "            \"property\": \"姓名*\",\n" +
+                "            \"operator\": \"Equal\",\n" +
+                "            \"value\": \"田其东\"\n" +
                 "        }\n" +
                 "    ],\n" +
                 "    \"logicOperators\": [],\n" +
@@ -409,6 +434,13 @@ class SolutionTest {
                 js
             )
         }
-        println(sol)
+
+        println(sol.size)
+        println(sol.joinToString("\n") {
+            it.nodes.entries.joinToString { e -> e.value.name }
+        })
+
+
+
     }
 }

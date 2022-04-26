@@ -46,7 +46,10 @@ public suspend fun IdeographContext.solveCompositePattern(pattern: CompositePatt
                     val narrowedPattern = Pattern(
                         pattern.nodes,
                         pattern.edges,
-                        it.unzip().first
+                        it.map { (c, reversed) ->
+                            if(reversed) c.copy(isReversed = !c.isReversed)
+                            else c
+                        }
                     )
                     println("[Composite Solver] Starting Coroutine $index: ${narrowedPattern}")
                     val result = solvePatternBatched(narrowedPattern)

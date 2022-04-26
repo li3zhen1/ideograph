@@ -38,7 +38,9 @@ public data class PatternConstraint(
 
     val property: String,
     val operator: ComparisonOperator,
-    val value: String
+    val value: String,
+
+    val isReversed: Boolean = false
 ) : IdentifiablePattern
 
 
@@ -173,12 +175,25 @@ fun PatternSolution.uniqKey(): String = nodes.toList().joinToString("") {
     it.second.edgeId.toString()
 }
 
-/**
- * assuming is paired
- */
+
+fun WorkspaceNode.satisfies(constraint: PatternConstraint): Boolean {
+    val prop = properties[constraint.property].orEmpty()
+    val satisfiesRaw = when (constraint.operator) {
+        ComparisonOperator.MatchRegex -> prop.matches(Regex(constraint.value))
+        ComparisonOperator.Equal -> prop == constraint.value
+        ComparisonOperator.NotEqual -> prop != constraint.value
+        ComparisonOperator.Less -> prop < constraint.value
+        ComparisonOperator.LessOrEqual -> prop <= constraint.value
+        ComparisonOperator.Greater -> prop > constraint.value
+        ComparisonOperator.GreaterOrEqual -> prop >= constraint.value
+    }
+    return if (constraint.isReversed) !satisfiesRaw else satisfiesRaw
+}
+
 fun List<PatternConstraint>?.validate(workspaceNode: WorkspaceNode): Boolean {
     if (this == null) return true
+
     return this.all {
-        workspaceNode.properties[it.property].orEmpty().matches(Regex(it.value))
+        workspaceNode.satisfies(it)
     }
 }
