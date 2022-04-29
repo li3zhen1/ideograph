@@ -36,8 +36,7 @@ open class DisjointSet<T, K : Comparable<K>>(
                 val rankDiff = rankMap[xRepId]!! - rankMap[yRepId]!!
                 if (rankDiff == 0) {
                     rankMap[xRepId] = rankMap[xRepId]!! + 1
-                }
-                else if (rankDiff < 0) {
+                } else if (rankDiff < 0) {
                     xRep = yRep.also { yRep = xRep }
                     xRepId = yRepId.also { yRepId = xRepId }
                 }
@@ -66,7 +65,7 @@ open class DisjointSet<T, K : Comparable<K>>(
 class DirectedDisjointSet<T, K : Comparable<K>>(
     private val nodes: Collection<T>,
     private val getId: T.() -> K
-): DisjointSet<T, K>(nodes, getId) {
+) : DisjointSet<T, K>(nodes, getId) {
     override fun union(parent: T, child: T): DisjointSet<T, K> {
         if (includes(parent) && includes(child)) {
             val xRep = findSet(parent)
@@ -86,4 +85,69 @@ class DirectedDisjointSet<T, K : Comparable<K>>(
         }
         return this
     }
+}
+
+
+data class MergeSet<T, K : Comparable<K>>(
+    private val nodes: Collection<T>,
+    private inline val getId: T.() -> K
+) {
+    private val idList = nodes.map(getId)
+    private val rootChildrenMap = idList.associateWith { mutableListOf(it) }.toMutableMap()
+    private val childRootMap = idList.associateBy { it }.toMutableMap()
+
+    fun union(a: T, b: T) {
+        val aRootId = childRootMap[a.getId()]!!
+        val bRootId = childRootMap[b.getId()]!!
+
+        if (aRootId === bRootId) return
+
+        val aGroup = rootChildrenMap[aRootId]!!
+        val bGroup = rootChildrenMap[bRootId]!!
+
+        if (aGroup.size >= bGroup.size) {
+            bGroup.forEach {
+                childRootMap[it] = aRootId
+            }
+            rootChildrenMap[aRootId]!! += bGroup
+            rootChildrenMap.remove(bRootId)
+        } else {
+            aGroup.forEach {
+                childRootMap[it] = bRootId
+            }
+            rootChildrenMap[bRootId]!! += aGroup
+            rootChildrenMap.remove(aRootId)
+        }
+    }
+
+    fun union(pairs: Map<T, T>) {
+        pairs.forEach { (a, b) ->
+            union(a, b)
+        }
+    }
+
+
+    public fun directedUnion(parent: T, child: T) {
+        val parentRootId = childRootMap[parent.getId()]!!
+        val childRootId = childRootMap[child.getId()]!!
+
+        if (parentRootId === childRootId) return
+
+        val parentGroup = rootChildrenMap[parentRootId]!!
+        val childGroup = rootChildrenMap[childRootId]!!
+
+        childGroup.forEach {
+            childRootMap[it] = childRootId
+        }
+        rootChildrenMap[parentRootId]!! += childGroup
+        rootChildrenMap.remove(childRootId)
+    }
+
+    public fun directedUnion(pairs: Map<T, T>) {
+        pairs.forEach { (a, b) ->
+            directedUnion(a, b)
+        }
+    }
+
+    val rootGroupMap get(): Map<K, List<K>> = rootChildrenMap
 }

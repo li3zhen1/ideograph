@@ -9,31 +9,32 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.20"
 
     `java-library`
+
 }
 
 
-java {
-    withSourcesJar()
-}
-
+//java {
+//    withSourcesJar()
+//}
+//
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
 }
-
-tasks.jar {
-    manifest {
-        attributes(mapOf("Implementation-Title" to project.name,
-            "Implementation-Version" to project.version))
-    }
-    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
-
-    from(sourceSets.main.get().output)
-
-    dependsOn(configurations.runtimeClasspath)
-    from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-    })
-}
+//
+//tasks.jar {
+//    manifest {
+//        attributes(mapOf("Implementation-Title" to project.name,
+//            "Implementation-Version" to project.version))
+//    }
+//    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+//
+//    from(sourceSets.main.get().output)
+//
+//    dependsOn(configurations.runtimeClasspath)
+//    from({
+//        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+//    })
+//}
 
 group = "me.lizhen"
 version = "0.0.1"

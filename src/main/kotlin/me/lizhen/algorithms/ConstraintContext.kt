@@ -16,15 +16,15 @@ class ConstraintContext(
 
     private fun getRootId(): String? {
 
-        val disjointSet = DirectedDisjointSet(allPatterns) { patternId }
+        val disjointSet = MergeSet(allPatterns) { patternId }
 
         connections.forEach { (from, to) ->
             val fromPattern = allPatternMap[from] ?: return@forEach
             val toPattern = allPatternMap[to] ?: return@forEach
-            disjointSet.union(toPattern, fromPattern)
+            disjointSet.directedUnion(toPattern, fromPattern)
         }
 
-        return disjointSet.sizeMap.maxByOrNull { it.value }?.key
+        return disjointSet.rootGroupMap.maxByOrNull { (root, group) -> group.size }?.key
     }
 
     private fun getSyntaxTree(): ConstraintSyntaxNode? {

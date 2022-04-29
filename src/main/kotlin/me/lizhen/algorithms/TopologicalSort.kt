@@ -46,9 +46,7 @@ class TopologicalSorter<T>(
     public fun merge(vararg others: TopologicalSorter<T>): List<T> {
         this.items += others.flatMap { ts -> ts.items.map { it.copy() } }
         items.sortedBy { it.rank }
-        this.items.forEachIndexed { id, it ->
-            it.seq = id
-        }
+        this.items.forEachIndexed { id, it -> it.seq = id }
         val valid = internalSort()
         assert(valid) { "merge created a dependencies error" }
         return nodes
@@ -61,15 +59,29 @@ class TopologicalSorter<T>(
     }
 
     private fun internalSort(): Boolean {
-        val graph = mapOf<String, String>()
-        val graphAfters = mapOf<String, String>()
-        val groups = mutableMapOf<String, List<String>>()
+        val graph = mutableMapOf<Int, List<Int>>()
+        val graphAfters = mutableMapOf<String, MutableList<Int>>()
+        val groups = mutableMapOf<String, MutableList<Int>>()
         items.forEach {
             val seq = it.seq
             val group = it.group
 
-//            groups.getOrPut(seq)
+            groups.getOrPut(group) { mutableListOf() }.add(seq)
+
+//            graph[seq] = it.before
+
+            it.after.forEach { afterIt ->
+                graphAfters.getOrPut(afterIt) { mutableListOf() }.add(seq)
+            }
         }
+
+//        graph.forEach { (key, value) ->
+//            val expandedGroups = value.flatMap {
+//                groups.getOrPut(it) { mutableListOf() }
+//            }
+//            graph[key] = expandedGroups
+//        }
+
         throw NotImplementedError()
     }
 
