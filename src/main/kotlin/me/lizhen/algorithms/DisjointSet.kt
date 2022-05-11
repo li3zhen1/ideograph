@@ -133,11 +133,11 @@ data class MergeSet<T, K : Comparable<K>>(
 
         if (parentRootId === childRootId) return
 
-        val parentGroup = rootChildrenMap[parentRootId]!!
+//        val parentGroup = rootChildrenMap[parentRootId]!!
         val childGroup = rootChildrenMap[childRootId]!!
 
         childGroup.forEach {
-            childRootMap[it] = childRootId
+            childRootMap[it] = parentRootId
         }
         rootChildrenMap[parentRootId]!! += childGroup
         rootChildrenMap.remove(childRootId)

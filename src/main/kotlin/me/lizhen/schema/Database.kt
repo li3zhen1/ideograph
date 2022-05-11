@@ -28,6 +28,18 @@ data class HasRelationConceptEdge(
     val name: String,
 )
 
+
+@Serializable
+data class HasSubConceptEdge(
+    val _id: String,
+    val fromId: Long,
+    val toId: Long,
+    val edgeId: Long,
+    val relationId: Long,
+    val name: String,
+)
+
+
 @Serializable
 data class HasPropertyEdge(
     val _id: String,
@@ -87,6 +99,9 @@ data class WorkspaceNode(
         return false
     }
 
+    override fun toString(): String {
+        return "WorkspaceNode(name=$name, nodeId=$nodeId)"
+    }
     override fun hashCode() = _id.hashCode()
 }
 
@@ -111,6 +126,9 @@ data class WorkspaceEdge(
 //    val trustedTimeliness: Long,
 //    val trustedValue: Long
 ) {
+    override fun toString(): String {
+        return "WorkspaceEdge(edgeId=$edgeId, fromId=$fromId, toId=$toId, name=$name)"
+    }
     override fun equals(other: Any?): Boolean {
         if(other is WorkspaceEdge)
             return (edgeId == other.edgeId

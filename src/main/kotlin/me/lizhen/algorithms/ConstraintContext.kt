@@ -81,6 +81,9 @@ class ConstraintContext(
     fun splitSyntaxTree()
             : List<List<Pair<PatternConstraint, Boolean>>>? {
         val nativeSyntaxTree = getSyntaxTree() ?: return null
+
+        println(nativeSyntaxTree)
+
         val (idList, ones) = nativeSyntaxTree.getOnes()
         val terms = QuineMcCluskey.simplify(ones).toList()
         return terms.map { term ->

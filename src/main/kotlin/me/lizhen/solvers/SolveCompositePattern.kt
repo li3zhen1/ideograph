@@ -25,7 +25,7 @@ public suspend fun IdeographContext.solveCompositePattern(pattern: CompositePatt
     println(pattern.connections?.size)
     println(pattern.constraints?.size)
     println(pattern.logicOperators?.size)
-    if (pattern.constraints !== null
+    if (!pattern.constraints.isNullOrEmpty()
         && pattern.logicOperators !== null
         && pattern.connections !== null
     ) {
@@ -34,7 +34,7 @@ public suspend fun IdeographContext.solveCompositePattern(pattern: CompositePatt
             pattern.logicOperators,
             pattern.connections.filter { it.from !== it.to }.map { it.from to it.to }
         )
-        val splitConstraints = constraintContext.splitSyntaxTree() ?: return emptyList()
+        val splitConstraints = constraintContext.splitSyntaxTree() ?: emptyList()
 
         splitConstraints.forEachIndexed { index, it ->
             println("[Logic $index] $it")
@@ -47,11 +47,11 @@ public suspend fun IdeographContext.solveCompositePattern(pattern: CompositePatt
                         pattern.nodes,
                         pattern.edges,
                         it.map { (c, reversed) ->
-                            if(reversed) c.copy(isReversed = !c.isReversed)
+                            if (reversed) c.copy(isReversed = !c.isReversed)
                             else c
                         }
                     )
-                    println("[Composite Solver] Starting Coroutine $index: ${narrowedPattern}")
+                    println("[Composite Solver] Starting Coroutine $index: $narrowedPattern")
                     val result = solvePatternBatched(narrowedPattern)
                     println("[Composite Solver] Finishing Coroutine $index with ${result.size} results.")
                     channel.send(result)

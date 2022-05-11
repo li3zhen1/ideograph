@@ -2,7 +2,7 @@ package me.lizhen
 
 import me.lizhen.algorithms.QuineMcCluskey
 import me.lizhen.algorithms.Term
-import org.junit.Test
+import kotlin.test.*
 
 
 

@@ -10,39 +10,43 @@ plugins {
 
     `java-library`
 
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 
-//java {
-//    withSourcesJar()
-//}
-//
+java {
+    withSourcesJar()
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
 }
-//
-//tasks.jar {
-//    manifest {
-//        attributes(mapOf("Implementation-Title" to project.name,
-//            "Implementation-Version" to project.version))
-//    }
-//    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
-//
-//    from(sourceSets.main.get().output)
-//
-//    dependsOn(configurations.runtimeClasspath)
-//    from({
-//        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-//    })
-//}
+
+tasks.jar {
+    manifest {
+        attributes(mapOf("Implementation-Title" to project.name,
+            "Implementation-Version" to project.version))
+    }
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+
+
+    from(sourceSets.main.get().output)
+
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+}
 
 group = "me.lizhen"
-version = "0.0.1"
+version = "0.0.3-engine-main"
 application {
-    mainClass.set("me.lizhen.ApplicationKt")
+//    mainClass.set("me.lizhen.ApplicationKt")
 
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+    mainClass.set("io.ktor.server.netty.EngineMain")
+
+//    val isDevelopment: Boolean = project.ext.has("development")
+//    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 
 }
 
@@ -60,6 +64,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auto-head-response-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-cors-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

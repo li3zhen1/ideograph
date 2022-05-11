@@ -41,46 +41,59 @@ fun IdeographContext.initializeSchemaAsync() {
             .toList()
         propertyFromDict = hasPropertyEdges.groupBy { it.fromId }
     }
+
+    CoroutineScope(Dispatchers.IO).launch {
+        hasSubConceptEdges = mongoService
+            .getCollection<HasSubConceptEdge>("hasSubConcept_edge")
+            .find()
+            .toList()
+    }
 }
 
 
-
 fun IdeographContext.initializeSchema() {
-        conceptNodes = runBlocking {
-            mongoService
-                .getCollection<ConceptNode>("concept_node")
-                .find()
-                .toList()
-        }
-        conceptTypeDict = conceptNodes.associateBy { it.name }
+    conceptNodes = runBlocking {
+        mongoService
+            .getCollection<ConceptNode>("concept_node")
+            .find()
+            .toList()
+    }
+    conceptTypeDict = conceptNodes.associateBy { it.name }
 
-        propertyNodes = runBlocking {
-            mongoService
-                .getCollection<PropertyNode>("property_node")
-                .find()
-                .toList()
-        }
+    propertyNodes = runBlocking {
+        mongoService
+            .getCollection<PropertyNode>("property_node")
+            .find()
+            .toList()
+    }
 
-        relationNodes = runBlocking {
-            mongoService
-                .getCollection<RelationNode>("relation_node")
-                .find()
-                .toList()
-        }
-        hasRelationConceptEdges = runBlocking {
-            mongoService
-                .getCollection<HasRelationConceptEdge>("hasRelationConcept_edge")
-                .find()
-                .toList()
-        }
-        relationConceptFromDict = hasRelationConceptEdges.groupBy { it.fromId }
-        relationConceptDict = hasRelationConceptEdges.associateBy { it.relationId }
-        hasPropertyEdges = runBlocking{
-            mongoService
-                .getCollection<HasPropertyEdge>("hasProperty_edge")
-                .find()
-                .toList()
-        }
-        propertyFromDict = hasPropertyEdges.groupBy { it.fromId }
+    relationNodes = runBlocking {
+        mongoService
+            .getCollection<RelationNode>("relation_node")
+            .find()
+            .toList()
+    }
+    hasRelationConceptEdges = runBlocking {
+        mongoService
+            .getCollection<HasRelationConceptEdge>("hasRelationConcept_edge")
+            .find()
+            .toList()
+    }
+    relationConceptFromDict = hasRelationConceptEdges.groupBy { it.fromId }
+    relationConceptDict = hasRelationConceptEdges.associateBy { it.relationId }
+    hasPropertyEdges = runBlocking {
+        mongoService
+            .getCollection<HasPropertyEdge>("hasProperty_edge")
+            .find()
+            .toList()
+    }
+    propertyFromDict = hasPropertyEdges.groupBy { it.fromId }
+
+    hasSubConceptEdges = runBlocking {
+        mongoService
+            .getCollection<HasSubConceptEdge>("hasSubConcept_edge")
+            .find()
+            .toList()
+    }
 }
 

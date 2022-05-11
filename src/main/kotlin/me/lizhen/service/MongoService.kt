@@ -7,7 +7,6 @@ import org.litote.kmongo.coroutine.*
 class MongoService(
     port: Int = 27025,
     hostAddress: String = "162.105.88.139",
-
     userName: String = "rootxyx",
     password: String = "woxnsk!",
     databaseName: String = "relation"

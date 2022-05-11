@@ -18,6 +18,7 @@ data class IdeographSchema(
     val propertyNodes: List<PropertyNode>,
     val hasPropertyEdges: List<HasPropertyEdge>,
     val hasRelationConceptEdges: List<HasRelationConceptEdge>,
+    val hasSubConceptEdges: List<HasSubConceptEdge>
 )
 
 @Serializable
@@ -186,9 +187,10 @@ class IdeographContext(
 //    val dgraphService: DgraphService
 ) {
     init {
-        if (asyncInitialize)
-            initializeSchemaAsync()
-        else initializeSchema()
+        if (asyncInitialize) {
+            runBlocking { initializeSchemaAsync() }
+            println("Scheme Initialized.")
+        } else initializeSchema()
     }
 
 
@@ -201,6 +203,7 @@ class IdeographContext(
     lateinit var relationConceptFromDict: Map<Long, List<HasRelationConceptEdge>>
     lateinit var hasPropertyEdges: List<HasPropertyEdge>
     lateinit var propertyFromDict: Map<Long, List<HasPropertyEdge>>
+    lateinit var hasSubConceptEdges: List<HasSubConceptEdge>
 
     @Deprecated("Use solvePatternBatched instead.")
     suspend fun solvePattern(pattern: Pattern): List<PatternSolution> {
@@ -341,7 +344,7 @@ class IdeographContext(
         return solutionPool.mapNotNull { it.completed() }
     }
 
-    private suspend fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
+    suspend fun countConstrainedNodes(node: PatternNode, vararg constraints: PatternConstraint): Long {
         return mongoService
             .getCollection<WorkspaceNode>(node.type + "_node")
             .countDocuments(constraints.asBsonOnNode())
@@ -354,7 +357,7 @@ class IdeographContext(
     ): Long = mongoService
         .getCollection<WorkspaceNode>(node.type + "_node")
         .countDocuments(
-            clientSession = session,
+//            clientSession = session,
             filter = constraints.asBsonOnNode()
         )
 
@@ -421,7 +424,7 @@ class IdeographContext(
         .batchSize(BATCH_SIZE)
 
 
-    private suspend fun queryEdges(
+    suspend fun queryEdges(
         edgeTypeName: String,
         nodeFrom: List<WorkspaceNode>? = null,
         nodeTo: List<WorkspaceNode>? = null
@@ -504,9 +507,17 @@ class IdeographContext(
 
             .batchSize(BATCH_SIZE)
     }
+
     private fun PatternNode.getConceptId() = conceptTypeDict[this.type]?.nodeId
 
-    val schema get() = IdeographSchema(conceptNodes, propertyNodes, hasPropertyEdges, hasRelationConceptEdges)
+    val schema
+        get() = IdeographSchema(
+            conceptNodes,
+            propertyNodes,
+            hasPropertyEdges,
+            hasRelationConceptEdges,
+            hasSubConceptEdges
+        )
 
 
     @JvmName("solveCompositePatternFromStringAsync")
