@@ -39,7 +39,7 @@ tasks.jar {
 }
 
 group = "me.lizhen"
-version = "0.0.3-engine-main"
+version = "0.0.4-engine-main"
 application {
 //    mainClass.set("me.lizhen.ApplicationKt")
 
@@ -64,8 +64,8 @@ dependencies {
     implementation("io.ktor:ktor-server-auto-head-response-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-cors-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:2.0.1")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 }
