@@ -85,5 +85,4 @@ data class ConstraintSyntaxNode(
         return Pair(idList, result.toIntArray())
     }
 
-
 }
