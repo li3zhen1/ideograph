@@ -79,7 +79,7 @@ internal suspend fun IdeographContext.solvePatternWithAggregation(
 ): List<PatternSolution> {
 
     val nodePool = pattern.nodes.associateBy { it.patternId }.toMutableMap()
-    val edgePool = pattern.edges.orEmpty().associateBy { it.toPatternId }.toMutableMap()
+    val edgePool = pattern.edges.orEmpty().associateBy { it.patternId }.toMutableMap()
     val constraintPool = pattern.constraints.orEmpty().groupBy { it.targetPatternId }.toMutableMap()
 
     val clonedNodes = mutableMapOf<String, List<PatternNode>>()
@@ -147,7 +147,7 @@ internal suspend fun IdeographContext.solvePatternWithAggregation(
 
     val brokenPattern = Pattern(
         nodes = nodePool.map { it.value } + clonedNodes.flatMap { it.value },
-        edges = edgePool.map {it.value} + clonedEdges.flatMap { it.value },
+        edges = edgePool.map { it.value } + clonedEdges.flatMap { it.value },
         constraints = constraintPool.flatMap { it.value } + clonedConstraints.flatMap { it.value }
     )
 
