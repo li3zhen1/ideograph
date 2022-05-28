@@ -7,10 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import me.lizhen.plugins.*
-import me.lizhen.schema.CompositePattern
-import me.lizhen.schema.ConceptNode
-import me.lizhen.schema.HasRelationConceptEdge
-import me.lizhen.schema.Pattern
+import me.lizhen.schema.*
 import me.lizhen.service.MongoService
 import me.lizhen.solvers.*
 import me.lizhen.utils.withTimeMeasure
@@ -146,6 +143,19 @@ fun Application.module() {
             println(pattern)
             val (time, result) = withTimeMeasure {
                 context.solveCompositePattern(pattern)
+            }
+            call.respond(
+                PatternSolutionResponse(
+                    result, time, null
+                )
+            )
+        }
+
+        post("/solveCompositePatternWithAggregation") {
+            val pattern = call.receive<AggregatedPattern>()
+            println(pattern)
+            val (time, result) = withTimeMeasure {
+                context.solveCompositePatternWithAggregation(pattern)
             }
             call.respond(
                 PatternSolutionResponse(

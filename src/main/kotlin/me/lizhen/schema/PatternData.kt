@@ -1,11 +1,8 @@
 package me.lizhen.schema
 
-import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
-import me.lizhen.algorithms.ConstraintContext
 import me.lizhen.algorithms.LogicOperator
 import me.lizhen.solvers.PatternSolution
-import org.bson.conversions.Bson
 
 public interface IdentifiablePattern {
     val patternId: String
@@ -54,12 +51,29 @@ public data class PatternEdge(
     val toPatternId: String,
 ) : IdentifiablePattern
 
+@Serializable
+public data class PatternAggregation(
+    val nodes: List<String>,
+    val edges: List<String>,
+    val multiplier: Int,
+)
 
 @Serializable
 public data class Pattern(
     val nodes: List<PatternNode>,
     val edges: List<PatternEdge>?,
-    val constraints: List<PatternConstraint>?
+    val constraints: List<PatternConstraint>?,
+)
+
+@Serializable
+public data class AggregatedPattern(
+    val nodes: List<PatternNode>,
+    val edges: List<PatternEdge>?,
+    val constraints: List<PatternConstraint>?,
+    val aggregations: List<PatternAggregation>?,
+
+    val logicOperators: List<PatternLogicOperator>?,
+    val connections: List<ConstraintConnection>?
 )
 
 @Serializable
