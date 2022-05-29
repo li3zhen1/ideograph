@@ -53,13 +53,18 @@ data class IdeographCompositePattern(
     val databaseIdentifier: String,
 )
 
+
 fun Application.module() {
 
-    val mongoPort = environment.config.propertyOrNull("ktor.ideograph.mongodb.port")?.getString()
-    val mongoHost = environment.config.propertyOrNull("ktor.ideograph.mongodb.host")?.getString()
-    val mongoUserName = environment.config.propertyOrNull("ktor.ideograph.mongodb.userName")?.getString()
-    val mongoPassword = environment.config.propertyOrNull("ktor.ideograph.mongodb.password")?.getString()
-    val mongoDatabaseName = environment.config.propertyOrNull("ktor.ideograph.mongodb.databaseName")?.getString()
+    val getProperty = { it: String ->
+        environment.config.propertyOrNull(it)?.toString()
+    }
+
+    val mongoPort = getProperty("ktor.ideograph.mongodb.port")
+    val mongoHost = getProperty("ktor.ideograph.mongodb.host")
+    val mongoUserName = getProperty("ktor.ideograph.mongodb.userName")
+    val mongoPassword = getProperty("ktor.ideograph.mongodb.password")
+    val mongoDatabaseName = getProperty("ktor.ideograph.mongodb.databaseName")
 
     val mongoService = MongoService(
         mongoPort?.toInt() ?: 27025,
@@ -109,8 +114,7 @@ fun Application.module() {
             val selectedContext = contextMap[data.databaseIdentifier]
             if (selectedContext == null) {
                 call.respond(Error("Unable to resolve identifier"))
-            }
-            else {
+            } else {
                 val (time, result) = withTimeMeasure {
                     selectedContext.solveCompositePattern(data.pattern)
                 }
@@ -159,7 +163,7 @@ fun Application.module() {
                 context.solveCompositePatternWithAggregation(pattern)
             }
             call.respond(
-                PatternSolutionResponse(
+                AggregatedPatternSolutionResponse(
                     result, time, null
                 )
             )

@@ -211,3 +211,10 @@ fun List<PatternConstraint>?.validate(workspaceNode: WorkspaceNode): Boolean {
         workspaceNode.satisfies(it)
     }
 }
+
+
+@Serializable
+data class AggregatedPatternSolution(
+    val pattern: Pattern,
+    val solution: List<PatternSolution>,
+)

@@ -2,6 +2,7 @@ package me.lizhen.solvers
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
+import kotlinx.serialization.Serializable
 import me.lizhen.algorithms.ConstraintContext
 import me.lizhen.schema.*
 import kotlin.coroutines.coroutineContext
@@ -9,7 +10,7 @@ import kotlin.coroutines.coroutineContext
 @OptIn(ExperimentalCoroutinesApi::class)
 suspend fun IdeographContext.solveCompositePatternWithAggregation(
     pattern: AggregatedPattern
-): List<PatternSolution> {
+): List<AggregatedPatternSolution> {
     val sortedAggregations = pattern.aggregations.orEmpty().sortedBy { it.nodes.size }
 
     if (!pattern.constraints.isNullOrEmpty()
@@ -28,7 +29,7 @@ suspend fun IdeographContext.solveCompositePatternWithAggregation(
             println("[Logic $index] $it")
         }
 
-        val channel = Channel<List<PatternSolution>>()
+        val channel = Channel<AggregatedPatternSolution>()
 
         splitConstraints.forEachIndexed { index, it ->
             CoroutineScope(Dispatchers.IO).launch {
@@ -44,26 +45,26 @@ suspend fun IdeographContext.solveCompositePatternWithAggregation(
                     )
                     println("[Aggregated Solver] Starting Coroutine $index: $narrowedPattern")
                     val result = solvePatternWithAggregation(narrowedPattern)
-                    println("[Aggregated Solver] Finishing Coroutine $index with ${result.size} results.")
+                    println("[Aggregated Solver] Finishing Coroutine $index with ${result.solution.size} results.")
                     channel.send(result)
                 }
             }
         }
-        val solutions = mutableListOf<PatternSolution>()
+        val solutions = mutableListOf<AggregatedPatternSolution>()
         repeat(splitConstraints.size) {
             solutions += channel.receive()
         }
         coroutineContext.cancelChildren()
         return solutions
     } else {
-        return solvePatternWithAggregation(
+        return listOf(solvePatternWithAggregation(
             AggregatedMinimalPattern(
                 pattern.nodes,
                 pattern.edges,
                 pattern.constraints,
                 sortedAggregations,
             )
-        )
+        ))
     }
 }
 
@@ -74,9 +75,10 @@ data class AggregatedMinimalPattern(
     val aggregations: List<PatternAggregation>,
 )
 
+
 internal suspend fun IdeographContext.solvePatternWithAggregation(
     pattern: AggregatedMinimalPattern
-): List<PatternSolution> {
+): AggregatedPatternSolution {
 
     val nodePool = pattern.nodes.associateBy { it.patternId }.toMutableMap()
     val edgePool = pattern.edges.orEmpty().associateBy { it.patternId }.toMutableMap()
@@ -150,6 +152,9 @@ internal suspend fun IdeographContext.solvePatternWithAggregation(
         edges = edgePool.map { it.value } + clonedEdges.flatMap { it.value },
         constraints = constraintPool.flatMap { it.value } + clonedConstraints.flatMap { it.value }
     )
-
-    return solvePatternBatched(brokenPattern)
+    val solutions = solvePatternBatched(brokenPattern)
+    return AggregatedPatternSolution(
+        brokenPattern,
+        solutions
+    )
 }

@@ -34,6 +34,14 @@ data class PatternSolutionResponse(
     val message: String?
 )
 
+
+@Serializable
+data class AggregatedPatternSolutionResponse(
+    val solutions: List<AggregatedPatternSolution>,
+    val elapsedTimeInMillis: Long,
+    val message: String?
+)
+
 fun PatternSolution.validate(pattern: Pattern): Boolean {
     return nodes.all { (pid, wn) ->
 
