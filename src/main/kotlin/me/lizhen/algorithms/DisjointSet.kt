@@ -1,5 +1,6 @@
 package me.lizhen.algorithms
 
+
 open class DisjointSet<T, K : Comparable<K>>(
     private val nodes: Collection<T>,
     private val getId: T.() -> K

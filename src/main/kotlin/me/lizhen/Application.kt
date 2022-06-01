@@ -1,8 +1,6 @@
 package me.lizhen
 
 import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -11,8 +9,6 @@ import me.lizhen.schema.*
 import me.lizhen.service.MongoService
 import me.lizhen.solvers.*
 import me.lizhen.utils.withTimeMeasure
-import sun.security.krb5.internal.HostAddress
-import java.time.Month
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -56,18 +52,15 @@ data class IdeographCompositePattern(
 
 fun Application.module() {
 
-    val getProperty = { it: String ->
-        environment.config.propertyOrNull(it)?.toString()
-    }
 
-    val mongoPort = getProperty("ktor.ideograph.mongodb.port")
-    val mongoHost = getProperty("ktor.ideograph.mongodb.host")
-    val mongoUserName = getProperty("ktor.ideograph.mongodb.userName")
-    val mongoPassword = getProperty("ktor.ideograph.mongodb.password")
-    val mongoDatabaseName = getProperty("ktor.ideograph.mongodb.databaseName")
+    val mongoPort = environment.config.propertyOrNull("ktor.ideograph.mongodb.port")?.getString()
+    val mongoHost = environment.config.propertyOrNull("ktor.ideograph.mongodb.host")?.getString()
+    val mongoUserName = environment.config.propertyOrNull("ktor.ideograph.mongodb.userName")?.getString()
+    val mongoPassword = environment.config.propertyOrNull("ktor.ideograph.mongodb.password")?.getString()
+    val mongoDatabaseName = environment.config.propertyOrNull("ktor.ideograph.mongodb.databaseName")?.getString()
 
     val mongoService = MongoService(
-        mongoPort?.toInt() ?: 27025,
+        mongoPort?.toIntOrNull() ?: 27025,
         mongoHost ?: "162.105.88.139",
         mongoUserName ?: "rootxyx",
         mongoPassword ?: "woxnsk!",
