@@ -39,7 +39,7 @@ tasks.jar {
 }
 
 group = "me.lizhen"
-version = "0.0.4-engine-main"
+version = "0.0.5-engine-main"
 application {
 //    mainClass.set("me.lizhen.ApplicationKt")
 
